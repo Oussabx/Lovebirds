@@ -427,6 +427,9 @@
       '<div class="card" style="padding:16px"><div class="stat__label">Contact</div>',
       '<p style="margin:8px 0"><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a><br>' + esc(c.phone) + '</p>',
       order.note ? '<div class="stat__label" style="margin-top:12px">Note for the card</div><p style="margin-top:6px">' + esc(order.note) + '</p>' : '',
+      order.notified ? '<div class="stat__label" style="margin-top:12px">WhatsApp alert</div><p style="margin-top:6px;font-size:.86rem">' +
+        (order.notified.sent ? 'Sent to you via ' + esc(order.notified.provider) : 'Not sent — ' + esc(order.notified.error || order.notified.skipped || 'unknown reason')) +
+        '</p>' : '',
       '</div></div>',
 
       '<div class="card" style="padding:16px;margin-bottom:18px"><div class="stat__label">Items</div>',

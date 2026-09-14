@@ -4,6 +4,7 @@
    the browser. */
 const L = require('./_lib');
 const DEFAULTS = require('./_defaults');
+const notify = require('./_notify');
 
 const STATUSES = ['new', 'confirmed', 'packed', 'delivered', 'cancelled'];
 const INDEX = 'lb:orders';
@@ -83,8 +84,16 @@ module.exports = L.handle(async (req, res) => {
       adminNote: ''
     };
 
+    /* Store first so an order is never lost to a slow notification. */
     await L.setJSON('lb:order:' + order.id, order);
     await L.cmd('ZADD', INDEX, Date.now(), order.id);
+
+    const notice = await notify.notifyOrder(order, settings);
+    if (notice.sent || notice.error) {
+      order.notified = notice;
+      await L.setJSON('lb:order:' + order.id, order);
+    }
+
     return L.ok(res, { order: order });
   }
 

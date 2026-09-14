@@ -62,6 +62,9 @@ there — there is no need to touch code.
 | Images | Upload photos (they are shrunk in the browser first) and pick them anywhere an image is used |
 | Account & backup | Change the password, download or restore a full backup, undo the last save, reset the shop to its original content |
 
+Shop settings also holds the WhatsApp order alerts — switch them on or off, choose
+whether the customer's details ride along, and send yourself a test message.
+
 Changes are held until you press **Save changes** (or ⌘/Ctrl + S); **Discard** throws
 them away. Saving publishes to every visitor immediately.
 
@@ -87,6 +90,54 @@ and anything saved disappears when the server restarts. Once you change the
 password inside the dashboard, the stored password takes over and
 `ADMIN_PASSWORD` is only a fallback.
 
+## Getting a WhatsApp alert when an order arrives
+
+Add the variables below the same way as `ADMIN_PASSWORD` (type **Secret**; the
+**Import .env** button takes several at once), redeploy, then test it from
+**Shop settings → Order alerts on WhatsApp → Send a test message**. The order
+detail in the dashboard shows whether each alert went out.
+
+Where the alert goes: **`WHATSAPP_NOTIFY_TO`** — digits only, with the country
+code, e.g. `9613123456`. Leave it out and it uses the shop's own WhatsApp number
+from the dashboard.
+
+Pick one provider. They are tried in this order:
+
+**1 · WhatsApp Cloud API (Meta — official)**
+
+| Variable | What it is |
+| --- | --- |
+| `WHATSAPP_TOKEN` | permanent access token from your Meta app |
+| `WHATSAPP_PHONE_ID` | the phone number id shown in the WhatsApp panel |
+| `WHATSAPP_TEMPLATE` | optional: an approved template name |
+| `WHATSAPP_TEMPLATE_LANG` | optional: template language, defaults to `en` |
+
+Meta only allows free-form messages within 24 hours of you last messaging the
+business number. For alerts that always arrive, create an approved template with
+**three variables** (order number, customer name, total) and set
+`WHATSAPP_TEMPLATE`. Without a template you'll get messages only inside that
+24-hour window.
+
+**2 · Twilio**
+
+| Variable | What it is |
+| --- | --- |
+| `TWILIO_ACCOUNT_SID` | from the Twilio console |
+| `TWILIO_AUTH_TOKEN` | from the Twilio console |
+| `TWILIO_WHATSAPP_FROM` | your Twilio WhatsApp sender, e.g. `+14155238886` |
+
+The same 24-hour rule applies; Twilio's sandbox is fine for trying it out.
+
+**3 · CallMeBot** — free and quickest to set up, but a third-party service and
+for personal numbers only. Follow the sign-up steps on the CallMeBot WhatsApp
+API page to get your key, then set `CALLMEBOT_API_KEY`. Your order details pass
+through their servers, so if that bothers you turn off *“Include the customer's
+name, address and phone”* in the dashboard — the alert then carries only the
+order number, items and total.
+
+With nothing configured, orders are simply saved without an alert; the shop is
+unaffected either way.
+
 ## How the data works
 
 * `GET /api/content` — the live site content (public, cached for 10 seconds).
@@ -97,6 +148,7 @@ password inside the dashboard, the stored password takes over and
 * `GET/PATCH/DELETE /api/orders` — the dashboard reads and updates orders.
 * `POST /api/media`, `GET /api/media?id=…` — uploaded pictures.
 * `POST /api/auth` — sign in, sign out, change password.
+* `GET/POST /api/notify` — alert status and test message (dashboard only).
 
 Sessions are HttpOnly, Secure, SameSite=Strict cookies; every write also requires
 an `X-LB-Admin` header, so a cross-site form cannot reach the API. Sign-in
@@ -152,6 +204,8 @@ api/
   auth.js                sign in / out, change password
   content.js             read, save, undo, reset the site content
   orders.js              create (public), read / update / delete (dashboard)
+  _notify.js             WhatsApp alert when an order arrives (Meta, Twilio or CallMeBot)
+  notify.js              alert status and test message
   media.js               image upload, serving and deletion
 assets/
   css/lovebirds.css      design tokens, layout, components, motion, responsive rules

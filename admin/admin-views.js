@@ -486,6 +486,12 @@
         fText('settings.paymentNote', 'Payment note', { hint: 'Shown in the footer and on the order' }) +
         fStrings('settings.countries', 'Countries you deliver to', { placeholder: 'Add a country' })),
 
+      card('Order alerts on WhatsApp',
+        fSwitch('settings.notifications.whatsappEnabled', 'Message me on WhatsApp when an order arrives') +
+        fSwitch('settings.notifications.includeCustomer', 'Include the customer’s name, address and phone in that message') +
+        '<div class="field__hint" data-notify-status style="margin-top:4px">Checking…</div>' +
+        '<button class="btn btn--ghost btn--sm" style="margin-top:14px" data-notify-test>Send a test message</button>'),
+
       card('Announcement bar',
         fSwitch('settings.announcement.enabled', 'Show a bar at the very top of the site') +
         fText('settings.announcement.text', 'Bar text')),
@@ -513,6 +519,21 @@
       state.images.length ? '<div class="grid grid--media">' + tiles + '</div>'
         : '<div class="empty"><h3>No pictures yet</h3><p>Upload your product photos and they will appear here.</p></div>'
     ].join(''), '<button class="btn btn--sm" data-upload-trigger>' + ICON.plus + ' Upload pictures</button>');
+  }
+
+  async function bindNotify() {
+    const box = $('[data-notify-status]');
+    if (!box) return;
+    try {
+      const info = await api('/api/notify');
+      box.innerHTML = info.ready
+        ? '<span style="color:var(--ok)">●</span> Ready — ' + esc(info.providerName) + ' will message ' + esc(info.to) +
+          (info.enabled ? '' : ' <strong>(alerts are switched off above)</strong>')
+        : '<span style="color:var(--warn)">●</span> ' + esc(info.reason || 'Not set up yet.') +
+          ' Add the provider keys in Vercel — the README lists them.';
+    } catch (err) {
+      box.textContent = err.message;
+    }
   }
 
   function bindMedia() {
@@ -853,6 +874,21 @@
       }, true);
     }
 
+    /* notifications */
+    if (hit('[data-notify-test]')) {
+      const button = t.closest('[data-notify-test]');
+      const label = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Sending…';
+      try {
+        const result = await api('/api/notify', { method: 'POST', body: {} });
+        toast('Test sent to ' + result.to + ' via ' + result.provider, 'good');
+      } catch (err) { toast(err.message, 'bad'); }
+      button.disabled = false;
+      button.textContent = label;
+      return;
+    }
+
     /* appearance */
     if (hit('[data-match-shades]')) {
       const base = state.content.theme.wine;
@@ -936,7 +972,10 @@
   A.views = Object.assign(A.views, {
     products: viewProducts, categories: viewCategories, content: viewContent,
     appearance: viewAppearance, settings: viewSettings, media: viewMedia, account: viewAccount,
-    afterRender: (view) => { if (view === 'media') bindMedia(); }
+    afterRender: (view) => {
+      if (view === 'media') bindMedia();
+      if (view === 'settings') bindNotify();
+    }
   });
 
   A.boot = async function boot() {

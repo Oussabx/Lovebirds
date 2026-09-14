@@ -87,6 +87,10 @@ window.LB_DEFAULT_CONTENT = {
       "enabled": false,
       "text": "Free delivery on every order over $60 ♥"
     },
+    "notifications": {
+      "whatsappEnabled": true,
+      "includeCustomer": true
+    },
     "socials": {
       "instagram": "",
       "facebook": "",
