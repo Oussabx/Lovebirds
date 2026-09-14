@@ -18,7 +18,7 @@
                    'p-cards', 'p-tote', 'p-frame', 'p-chocolate', 'p-memorybox', 'scene-wrap', 'scene-note']
                    .map(n => 'assets/img/' + n + '.svg');
 
-  const previewSrc = (path) => (!path ? '' : (/^(https?:|\/)/.test(path) ? path : '../' + path));
+  const previewSrc = (path) => (!path ? '' : (/^(https?:|\/)/.test(path) ? path : '/' + path));
 
   function mix(hexA, hexB, amount) {
     const toRgb = (hex) => {
@@ -628,7 +628,7 @@
       '<img src="' + esc(image.url) + '" alt="' + esc(image.name) + '" loading="lazy"></button>').join('');
     const art = ARTWORK.map(src =>
       '<button class="media" data-choose="' + esc(src) + '" style="padding:0;border:1px solid var(--line)">' +
-      '<img src="../' + esc(src) + '" alt="" loading="lazy"></button>').join('');
+      '<img src="/' + esc(src) + '" alt="" loading="lazy"></button>').join('');
 
     modal([
       '<div class="modal__head"><h2>Choose a picture</h2><button class="iconbtn" data-close>' + ICON.close + '</button></div>',

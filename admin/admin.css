@@ -66,8 +66,8 @@ ul{margin:0;padding:0;list-style:none}
 }
 .gate__mark{
   width:64px;height:48px;margin:0 auto 14px;background:var(--wine);
-  -webkit-mask:url(../assets/img/logo-mark.svg) center/contain no-repeat;
-  mask:url(../assets/img/logo-mark.svg) center/contain no-repeat;
+  -webkit-mask:url(/assets/img/logo-mark.svg) center/contain no-repeat;
+  mask:url(/assets/img/logo-mark.svg) center/contain no-repeat;
 }
 .gate h1{font-size:2rem;color:var(--wine)}
 .gate__sub{font-size:.74rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:26px}
@@ -83,8 +83,8 @@ ul{margin:0;padding:0;list-style:none}
 }
 .side__brand{display:flex;align-items:center;gap:10px;padding:0 10px 22px;font-family:var(--display);font-size:1.35rem;color:#fff}
 .side__mark{width:34px;height:26px;background:var(--blush);
-  -webkit-mask:url(../assets/img/logo-mark.svg) center/contain no-repeat;
-  mask:url(../assets/img/logo-mark.svg) center/contain no-repeat;flex:none}
+  -webkit-mask:url(/assets/img/logo-mark.svg) center/contain no-repeat;
+  mask:url(/assets/img/logo-mark.svg) center/contain no-repeat;flex:none}
 .side__nav{display:grid;gap:2px;flex:1;overflow-y:auto}
 .side__item{
   display:flex;align-items:center;gap:11px;width:100%;text-align:left;
