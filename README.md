@@ -106,8 +106,11 @@ email/WhatsApp webhook) in `assets/js/checkout.js` when you are ready.
 
 ## Deploying
 
+* **Vercel** — New Project → import this repo → framework preset *Other* → Deploy.
+  No build command and no output directory: it is a static site and `vercel.json`
+  already sets the headers. Every push to `main` redeploys automatically.
 * **GitHub Pages** — Settings → Pages → deploy from branch `main`, folder `/ (root)`.
-* **Vercel / Netlify** — import the repo, framework preset *Other*, no build command, publish directory `.`.
+* **Netlify** — import the repo, no build command, publish directory `.`.
 
 ## Browser support
 
