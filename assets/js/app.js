@@ -148,7 +148,7 @@
       '</a>',
       '<div class="product-card__body">',
       '<span class="product-card__cat">' + cat + '</span>',
-      '<a href="product.html?id=' + p.id + '"><h3 class="product-card__title">' + p.name + '</h3></a>',
+      '<a class="product-card__link" href="product.html?id=' + p.id + '"><h3 class="product-card__title">' + p.name + '</h3></a>',
       '<p class="product-card__tag">' + p.short + '</p>',
       '<div class="product-card__foot">',
       '<span class="product-card__price">' + money(p.price) + '</span>',
@@ -330,9 +330,6 @@
     });
     const mail = copy('settings.email', '');
     $$('[data-mail]').forEach(a => { if (mail) a.setAttribute('href', 'mailto:' + mail); });
-    $$('[data-wa]').forEach(btn => {
-      btn.classList.toggle('is-unset', !CONFIG.whatsapp);
-    });
   }
 
   /* ------------------------------------------------------------- nav */

@@ -137,21 +137,44 @@
 
   function markDirty() { refreshSaveState(); }
 
+  let modalReturn = null;
+
   function modal(html, onOpen) {
     const host = $('[data-modal]');
-    host.innerHTML = '<div class="modal__card">' + html + '</div>';
+    modalReturn = document.activeElement;
+    host.innerHTML = '<div class="modal__card" role="dialog" aria-modal="true" tabindex="-1">' + html + '</div>';
     host.hidden = false;
     host.onclick = (e) => { if (e.target === host) closeModal(); };
-    document.addEventListener('keydown', escClose);
+    document.addEventListener('keydown', modalKeys);
     if (onOpen) onOpen(host);
+    const card = $('.modal__card', host);
+    const first = card.querySelector('input:not([type=hidden]), textarea, select, button');
+    (first || card).focus();
   }
+
   function closeModal() {
     const host = $('[data-modal]');
+    if (host.hidden) return;
     host.hidden = true;
     host.innerHTML = '';
-    document.removeEventListener('keydown', escClose);
+    document.removeEventListener('keydown', modalKeys);
+    if (modalReturn && modalReturn.focus) modalReturn.focus();
+    modalReturn = null;
   }
-  function escClose(e) { if (e.key === 'Escape') closeModal(); }
+
+  function modalKeys(e) {
+    if (e.key === 'Escape') return closeModal();
+    if (e.key !== 'Tab') return;
+    const card = $('.modal__card');
+    if (!card) return;
+    const focusable = Array.from(card.querySelectorAll('a[href], button:not([disabled]), input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter(el => el.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
 
   function confirmAction(message, onYes, danger) {
     modal([
@@ -240,7 +263,36 @@
     } catch (e) { state.images = []; }
   }
 
+  function contentProblems(content) {
+    const problems = [];
+    [['products', 'product'], ['categories', 'category']].forEach(([key, word]) => {
+      const seen = {};
+      (content[key] || []).forEach((entry, i) => {
+        const name = entry.name || (word + ' ' + (i + 1));
+        if (!entry.id || !String(entry.id).trim()) problems.push('“' + name + '” needs a web address id.');
+        else if (seen[entry.id]) problems.push('Two ' + key + ' share the id “' + entry.id + '” — ids must be unique.');
+        else if (!/^[a-zA-Z0-9._~-]+$/.test(entry.id)) problems.push('The id “' + entry.id + '” can only use letters, numbers and dashes.');
+        seen[entry.id] = true;
+        if (key === 'products' && entry.price != null && (isNaN(Number(entry.price)) || Number(entry.price) < 0)) {
+          problems.push('“' + name + '” needs a price of zero or more.');
+        }
+      });
+    });
+    const categoryIds = (content.categories || []).map(c => c.id);
+    (content.products || []).forEach(product => {
+      if (product.category && categoryIds.indexOf(product.category) === -1) {
+        problems.push('“' + (product.name || product.id) + '” points at a category that no longer exists.');
+      }
+    });
+    return problems;
+  }
+
   async function save() {
+    const problems = contentProblems(state.content);
+    if (problems.length) {
+      toast(problems[0], 'bad');
+      return;
+    }
     const button = $('[data-save]');
     button.disabled = true;
     button.textContent = 'Saving…';
@@ -410,7 +462,7 @@
     modal([
       '<div class="modal__head"><div><h2>' + esc(order.id) + '</h2>',
       '<p class="card__sub">' + new Date(order.placedAt).toLocaleString() + ' · ' + esc(order.payment) + '</p></div>',
-      '<button class="iconbtn" data-close>' + ICON.close + '</button></div>',
+      '<button class="iconbtn" data-close aria-label="Close">' + ICON.close + '</button></div>',
 
       '<div class="tabs">' + STATUSES.map(s =>
         '<button class="tab' + (order.status === s ? ' is-active' : '') + '" data-set-status="' + s + '">' +

@@ -18,6 +18,17 @@
                    'p-cards', 'p-tote', 'p-frame', 'p-chocolate', 'p-memorybox', 'scene-wrap', 'scene-note']
                    .map(n => 'assets/img/' + n + '.svg');
 
+  const slugify = (text) => String(text || '')
+    .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
+
+  const uniqueId = (base, list, skipIndex) => {
+    let candidate = base || 'item';
+    let n = 2;
+    while (list.some((entry, i) => i !== skipIndex && entry.id === candidate)) candidate = base + '-' + n++;
+    return candidate;
+  };
+
   const previewSrc = (path) => (!path ? '' : (/^(https?:|\/)/.test(path) ? path : '/' + path));
 
   function mix(hexA, hexB, amount) {
@@ -74,12 +85,42 @@
     return '<label class="switch"><input type="checkbox" data-bind="' + path + '" data-type="bool"' +
       (get(path) ? ' checked' : '') + '><span>' + esc(label) + '</span></label>';
   }
+  function luminance(hex) {
+    const h = String(hex || '').replace('#', '');
+    if (!/^[0-9a-f]{6}$/i.test(h)) return null;
+    const rgb = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255)
+      .map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+  }
+
+  function contrast(a, b) {
+    const l1 = luminance(a), l2 = luminance(b);
+    if (l1 === null || l2 === null) return null;
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  }
+
+  function contrastNote(path, value) {
+    const theme = state.content.theme || {};
+    const checks = {
+      'theme.wine': { against: theme.creamLight, need: 4.5, what: 'headings and buttons on the page' },
+      'theme.wineSoft': { against: theme.creamLight, need: 3, what: 'the handwritten accents' },
+      'theme.ink': { against: theme.creamLight, need: 4.5, what: 'body text' },
+      'theme.gold': { against: theme.creamLight, need: 3, what: 'the review stars' }
+    };
+    const check = checks[path];
+    if (!check || !check.against) return '';
+    const ratio = contrast(value, check.against);
+    if (ratio === null) return '';
+    if (ratio >= check.need) return '<span class="field__hint" style="color:var(--ok)">' + ratio.toFixed(1) + ':1 — easy to read</span>';
+    return '<span class="field__hint" style="color:var(--warn)">' + ratio.toFixed(1) + ':1 — a little faint for ' + check.what + '</span>';
+  }
+
   function fColour(path, label) {
     const value = get(path) || '#000000';
     return '<div class="field"><span class="field__label">' + esc(label) + '</span><div class="colour">' +
-      '<input type="color" data-colour="' + path + '" value="' + esc(value) + '">' +
-      '<input type="text" data-bind="' + path + '" data-colour-text="' + path + '" value="' + esc(value) + '">' +
-      '</div></div>';
+      '<input type="color" data-colour="' + path + '" value="' + esc(value) + '" aria-label="' + esc(label) + ' colour picker">' +
+      '<input type="text" data-bind="' + path + '" data-colour-text="' + path + '" value="' + esc(value) + '" aria-label="' + esc(label) + ' hex value">' +
+      '</div>' + contrastNote(path, value) + '</div>';
   }
   function fImage(path, label) {
     const value = get(path) || '';
@@ -98,7 +139,7 @@
         '<span class="tag">' + esc(item) + '<button data-string-remove="' + path + '" data-index="' + i + '" aria-label="Remove">×</button></span>'
       ).join('') + (list.length ? '' : '<span class="field__hint">Nothing yet</span>') + '</div>' +
       '<div style="display:flex;gap:8px;margin-top:8px">' +
-      '<input type="text" data-string-input="' + path + '" placeholder="' + esc(opts.placeholder || 'Add an item and press Enter') + '">' +
+      '<input type="text" data-string-input="' + path + '" aria-label="Add to ' + esc(label) + '" placeholder="' + esc(opts.placeholder || 'Add an item and press Enter') + '">' +
       '<button class="btn btn--ghost btn--sm" data-string-add="' + path + '">Add</button></div>' +
       hint(opts.hint) + '</div>';
   }
@@ -109,9 +150,9 @@
       '<div class="subform">',
       '<div class="subform__head"><strong>' + esc(label) + ' ' + (i + 1) + '</strong>',
       '<div class="list__actions">',
-      '<button class="iconbtn" data-move="' + path + '" data-index="' + i + '" data-dir="-1" title="Move up">' + ICON.up + '</button>',
-      '<button class="iconbtn" data-move="' + path + '" data-index="' + i + '" data-dir="1" title="Move down">' + ICON.down + '</button>',
-      '<button class="iconbtn iconbtn--danger" data-remove-item="' + path + '" data-index="' + i + '" title="Remove">' + ICON.trash + '</button>',
+      '<button class="iconbtn" data-move="' + path + '" data-index="' + i + '" data-dir="-1" title="Move up" aria-label="Move ' + esc(label) + ' ' + (i + 1) + ' up">' + ICON.up + '</button>',
+      '<button class="iconbtn" data-move="' + path + '" data-index="' + i + '" data-dir="1" title="Move down" aria-label="Move ' + esc(label) + ' ' + (i + 1) + ' down">' + ICON.down + '</button>',
+      '<button class="iconbtn iconbtn--danger" data-remove-item="' + path + '" data-index="' + i + '" title="Remove" aria-label="Remove ' + esc(label) + ' ' + (i + 1) + '">' + ICON.trash + '</button>',
       '</div></div>',
       fields.map(field => {
         const full = path + '.' + i + '.' + field.k;
@@ -129,6 +170,24 @@
       (rows || '<p class="field__hint" style="margin-bottom:10px">Nothing here yet.</p>') +
       '<button class="btn btn--ghost btn--sm" data-add-item="' + path + '" data-template="' +
       esc(JSON.stringify(opts.template || fields.reduce((o, f) => (o[f.k] = '', o), {}))) + '">' + ICON.plus + ' Add ' + esc(label.toLowerCase()) + '</button></div>';
+  }
+
+  function fGallery(path, productIndex) {
+    const list = (get(path) || []).filter(Boolean);
+    const tiles = list.map((src, i) => [
+      '<div class="media" style="width:96px">',
+      '<img src="' + esc(previewSrc(src)) + '" alt="" style="aspect-ratio:1">',
+      '<div class="media__bar" style="justify-content:center">',
+      '<button class="iconbtn" data-gallery-swap="' + path + '" data-index="' + i + '" aria-label="Replace picture ' + (i + 1) + '" title="Replace">' + ICON.edit + '</button>',
+      '<button class="iconbtn iconbtn--danger" data-gallery-remove="' + path + '" data-index="' + i + '" aria-label="Remove picture ' + (i + 1) + '" title="Remove">' + ICON.trash + '</button>',
+      '</div></div>'
+    ].join('')).join('');
+
+    return '<div class="field"><span class="field__label">Gallery pictures</span>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">' + tiles +
+      '<button class="btn btn--ghost btn--tiny" data-add-gallery="' + productIndex + '" style="height:96px;width:96px;flex-direction:column;gap:4px">' +
+      ICON.plus + '<span>Add</span></button></div>' +
+      '<span class="field__hint">The first picture is the one shoppers see first.</span></div>';
   }
 
   function card(title, body, actions) {
@@ -152,16 +211,16 @@
         (p.active === false ? ' · <span style="color:var(--bad)">hidden</span>' : '') + '</div>',
       '</div>',
       '<div class="list__actions">',
-      '<button class="iconbtn" data-move="products" data-index="' + index + '" data-dir="-1" title="Move up">' + ICON.up + '</button>',
-      '<button class="iconbtn" data-move="products" data-index="' + index + '" data-dir="1" title="Move down">' + ICON.down + '</button>',
-      '<button class="iconbtn" data-duplicate="' + index + '" title="Duplicate">' + ICON.copy + '</button>',
-      '<button class="iconbtn" data-edit-product="' + index + '" title="Edit">' + ICON.edit + '</button>',
-      '<button class="iconbtn iconbtn--danger" data-delete-product="' + index + '" title="Delete">' + ICON.trash + '</button>',
+      '<button class="iconbtn" data-move="products" data-index="' + index + '" data-dir="-1" title="Move up" aria-label="Move ' + esc(p.name) + ' up">' + ICON.up + '</button>',
+      '<button class="iconbtn" data-move="products" data-index="' + index + '" data-dir="1" title="Move down" aria-label="Move ' + esc(p.name) + ' down">' + ICON.down + '</button>',
+      '<button class="iconbtn" data-duplicate="' + index + '" title="Duplicate" aria-label="Duplicate ' + esc(p.name) + '">' + ICON.copy + '</button>',
+      '<button class="iconbtn" data-edit-product="' + index + '" title="Edit" aria-label="Edit ' + esc(p.name) + '">' + ICON.edit + '</button>',
+      '<button class="iconbtn iconbtn--danger" data-delete-product="' + index + '" title="Delete" aria-label="Delete ' + esc(p.name) + '">' + ICON.trash + '</button>',
       '</div></div>'
     ].join('')).join('');
 
     return card('Products', [
-      '<label class="field"><span>Search</span><input type="text" data-product-search value="' + esc(state.productSearch) + '" placeholder="Find a gift by name"></label>',
+      '<label class="field"><span>Search</span><input type="text" data-product-search value="' + esc(state.productSearch) + '" placeholder="Find a gift by name" aria-label="Search products"></label>',
       shown.length ? '<div class="list">' + rows + '</div>'
         : '<div class="empty"><h3>No gifts here</h3><p>Add your first product to fill the shop.</p></div>'
     ].join(''), '<button class="btn btn--sm" data-add-product>' + ICON.plus + ' Add product</button>');
@@ -180,7 +239,7 @@
 
     modal([
       '<div class="modal__head"><h2>' + esc(product.name || 'New product') + '</h2>',
-      '<button class="iconbtn" data-close>' + ICON.close + '</button></div>',
+      '<button class="iconbtn" data-close aria-label="Close">' + ICON.close + '</button></div>',
       '<div class="row row--2">' + fText(base + '.name', 'Name') + fText(base + '.id', 'Web address id', { hint: 'Used in the link: product.html?id=…' }) + '</div>',
       fText(base + '.script', 'Handwritten line', { placeholder: 'Two cups, one slow morning.' }),
       '<div class="row row--3">' +
@@ -193,8 +252,7 @@
       fText(base + '.short', 'One-line description'),
       fArea(base + '.description', 'Full description', { rows: 5 }),
       fImage(base + '.image', 'Main picture'),
-      fStrings(base + '.images', 'Gallery pictures', { placeholder: 'Paste an image link, or use Choose image above' }),
-      '<div style="margin:-8px 0 16px"><button class="btn btn--ghost btn--tiny" data-add-gallery="' + index + '">' + ICON.plus + ' Add a picture from your library</button></div>',
+      fGallery(base + '.images', index),
       fStrings(base + '.includes', 'What’s inside (bullet list)'),
       fStrings(base + '.tags', 'Small tags'),
       '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">',
@@ -210,9 +268,9 @@
       '<div class="subform">',
       '<div class="subform__head"><strong>' + esc(c.name || 'Category') + '</strong>',
       '<div class="list__actions">',
-      '<button class="iconbtn" data-move="categories" data-index="' + index + '" data-dir="-1">' + ICON.up + '</button>',
-      '<button class="iconbtn" data-move="categories" data-index="' + index + '" data-dir="1">' + ICON.down + '</button>',
-      '<button class="iconbtn iconbtn--danger" data-delete-category="' + index + '">' + ICON.trash + '</button>',
+      '<button class="iconbtn" data-move="categories" data-index="' + index + '" data-dir="-1" aria-label="Move ' + esc(c.name || 'category') + ' up">' + ICON.up + '</button>',
+      '<button class="iconbtn" data-move="categories" data-index="' + index + '" data-dir="1" aria-label="Move ' + esc(c.name || 'category') + ' down">' + ICON.down + '</button>',
+      '<button class="iconbtn iconbtn--danger" data-delete-category="' + index + '" aria-label="Delete the ' + esc(c.name || '') + ' category">' + ICON.trash + '</button>',
       '</div></div>',
       '<div class="row row--2">' + fText('categories.' + index + '.name', 'Name') +
         fText('categories.' + index + '.id', 'Id', { hint: 'Used in links — change with care' }) + '</div>',
@@ -508,8 +566,8 @@
       '<div class="media">',
       '<img src="' + esc(image.url) + '" alt="' + esc(image.name) + '" loading="lazy">',
       '<div class="media__bar"><span class="media__name">' + esc(image.name) + '</span>',
-      '<button class="iconbtn" data-copy-url="' + esc(image.url) + '" title="Copy link">' + ICON.copy + '</button>',
-      '<button class="iconbtn iconbtn--danger" data-delete-image="' + esc(image.id) + '" title="Delete">' + ICON.trash + '</button>',
+      '<button class="iconbtn" data-copy-url="' + esc(image.url) + '" title="Copy link" aria-label="Copy the link to ' + esc(image.name) + '">' + ICON.copy + '</button>',
+      '<button class="iconbtn iconbtn--danger" data-delete-image="' + esc(image.id) + '" title="Delete" aria-label="Delete ' + esc(image.name) + '">' + ICON.trash + '</button>',
       '</div></div>'
     ].join('')).join('');
 
@@ -623,17 +681,18 @@
 
   /* ------------------------------------------------------------- image picker */
   function openPicker(path) {
+    const artName = (src) => src.split('/').pop().replace(/^(p|scene)-/, '').replace(/\.svg$/, '').replace(/-/g, ' ');
     const library = state.images.map(image =>
-      '<button class="media" data-choose="' + esc(image.url) + '" style="padding:0;border:1px solid var(--line)">' +
+      '<button class="media" data-choose="' + esc(image.url) + '" style="padding:0;border:1px solid var(--line)" aria-label="Use ' + esc(image.name) + '">' +
       '<img src="' + esc(image.url) + '" alt="' + esc(image.name) + '" loading="lazy"></button>').join('');
     const art = ARTWORK.map(src =>
-      '<button class="media" data-choose="' + esc(src) + '" style="padding:0;border:1px solid var(--line)">' +
+      '<button class="media" data-choose="' + esc(src) + '" style="padding:0;border:1px solid var(--line)" aria-label="Use the ' + esc(artName(src)) + ' illustration">' +
       '<img src="/' + esc(src) + '" alt="" loading="lazy"></button>').join('');
 
     modal([
-      '<div class="modal__head"><h2>Choose a picture</h2><button class="iconbtn" data-close>' + ICON.close + '</button></div>',
+      '<div class="modal__head"><h2>Choose a picture</h2><button class="iconbtn" data-close aria-label="Close">' + ICON.close + '</button></div>',
       '<label class="field"><span>Paste a link</span><div style="display:flex;gap:8px">',
-      '<input type="text" data-url-input placeholder="https://…"><button class="btn btn--sm" data-url-use>Use</button></div></label>',
+      '<input type="text" data-url-input placeholder="https://…" aria-label="Image link"><button class="btn btn--sm" data-url-use>Use</button></div></label>',
       '<div class="card__head" style="margin:18px 0 10px"><h2 style="font-size:1rem">Your uploads</h2>',
       '<button class="btn btn--ghost btn--sm" data-picker-upload>Upload new</button>',
       '<input type="file" accept="image/*" data-picker-file hidden></div>',
@@ -643,14 +702,18 @@
       '<div class="grid grid--media">' + art + '</div>'
     ].join(''), (host) => {
       $('[data-close]', host).onclick = closeModal;
-      $$('[data-choose]', host).forEach(btn => {
-        btn.onclick = () => { setPath(state.content, path, btn.dataset.choose); closeModal(); markDirty(); render(); };
-      });
+      const finish = (value) => {
+        setPath(state.content, path, value);
+        closeModal();
+        markDirty();
+        render();
+        const product = /^products\.(\d+)\./.exec(path);
+        if (product) editProduct(Number(product[1]));
+      };
+      $$('[data-choose]', host).forEach(btn => { btn.onclick = () => finish(btn.dataset.choose); });
       $('[data-url-use]', host).onclick = () => {
         const value = $('[data-url-input]', host).value.trim();
-        if (!value) return;
-        setPath(state.content, path, value);
-        closeModal(); markDirty(); render();
+        if (value) finish(value);
       };
       const file = $('[data-picker-file]', host);
       $('[data-picker-upload]', host).onclick = () => file.click();
@@ -660,8 +723,7 @@
           const dataUrl = await shrink(file.files[0]);
           const payload = await api('/api/media', { method: 'POST', body: { name: file.files[0].name, dataUrl: dataUrl } });
           await loadImages();
-          setPath(state.content, path, payload.image.url);
-          closeModal(); markDirty(); render();
+          finish(payload.image.url);
           toast('Picture uploaded', 'good');
         } catch (err) { toast(err.message, 'bad'); }
       };
@@ -675,6 +737,27 @@
       let value = el.type === 'checkbox' ? el.checked : el.value;
       if (el.dataset.type === 'number') value = value === '' ? null : Number(value);
       setPath(state.content, el.dataset.bind, value);
+
+      /* While an id is still the generated placeholder, keep it in step with the name. */
+      const named = /^(products|categories)\.(\d+)\.name$/.exec(el.dataset.bind);
+      if (named) {
+        const list = state.content[named[1]];
+        const index = Number(named[2]);
+        const entry = list[index];
+        if (entry && /^(gift|new)-[a-z0-9]{4,}$/.test(entry.id || '')) {
+          entry.id = uniqueId(slugify(value) || entry.id, list, index);
+          const idInput = document.querySelector('[data-bind="' + named[1] + '.' + index + '.id"]');
+          if (idInput) idInput.value = entry.id;
+        }
+        const title = document.querySelector('.modal__head h2');
+        if (title && named[1] === 'products') title.textContent = value || 'Product';
+        const heading = el.closest('.subform');
+        if (heading) {
+          const label = heading.querySelector('.subform__head strong');
+          if (label) label.textContent = value || 'Untitled';
+        }
+      }
+
       if (el.dataset.colourText) {
         const swatch = document.querySelector('[data-colour="' + el.dataset.colourText + '"]');
         if (swatch && /^#[0-9a-f]{6}$/i.test(value)) swatch.value = value;
@@ -700,7 +783,14 @@
     }
   });
 
+  function closeSide() {
+    document.body.classList.remove('side-open');
+    const toggle = document.querySelector('[data-side-toggle]');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  }
+
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.classList.contains('side-open')) closeSide();
     const input = e.target.closest('[data-string-input]');
     if (input && e.key === 'Enter') { e.preventDefault(); addString(input.dataset.stringInput, input); }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
@@ -727,7 +817,12 @@
     if (nav) return go(nav.dataset.go);
 
     if (hit('[data-save]')) return save();
-    if (hit('[data-side-toggle]')) return document.body.classList.toggle('side-open');
+    if (hit('[data-side-toggle]')) {
+      const open = document.body.classList.toggle('side-open');
+      t.closest('[data-side-toggle]').setAttribute('aria-expanded', open ? 'true' : 'false');
+      return;
+    }
+    if (hit('[data-side-close]')) return closeSide();
 
     if (hit('[data-discard]')) {
       return confirmAction('Throw away the changes you have not saved?', async () => {
@@ -791,6 +886,21 @@
         state.content.products.splice(index, 1);
         markDirty(); render();
       }, true);
+    }
+    const swap = hit('[data-gallery-swap]');
+    if (swap) {
+      closeModal();
+      return openPicker(swap.dataset.gallerySwap + '.' + swap.dataset.index);
+    }
+    const removeShot = hit('[data-gallery-remove]');
+    if (removeShot) {
+      const list = get(removeShot.dataset.galleryRemove) || [];
+      list.splice(Number(removeShot.dataset.index), 1);
+      markDirty();
+      const modalOpen = document.querySelector('.modal__card');
+      if (modalOpen) { const i = /products\.(\d+)/.exec(removeShot.dataset.galleryRemove); closeModal(); render(); if (i) editProduct(Number(i[1])); }
+      else render();
+      return;
     }
     const gallery = hit('[data-add-gallery]');
     if (gallery) {

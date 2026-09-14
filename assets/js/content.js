@@ -73,6 +73,30 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
     return '#' + out.map(function (c) { return ('0' + c.toString(16)).slice(-2); }).join('');
   }
 
+  function luminance(hex) {
+    var rgb = toRgb(hex);
+    if (!rgb) return 1;
+    var a = rgb.map(function (v) {
+      v /= 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+  }
+
+  function contrast(a, b) {
+    var l1 = luminance(a), l2 = luminance(b);
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  }
+
+  /* Keep derived greys readable whatever colours the shop owner picks. */
+  function readable(colour, background, target) {
+    var candidate = colour;
+    for (var step = 0; step < 20 && contrast(candidate, background) < target; step++) {
+      candidate = mix(colour, '#000000', (step + 1) * 0.05);
+    }
+    return candidate;
+  }
+
   var FONT_STACKS = {
     display: ',"Hoefler Text",Georgia,"Times New Roman",serif',
     sans: ',"Helvetica Neue",Helvetica,Arial,sans-serif',
@@ -98,8 +122,11 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
       set('--blush-tint', mix(theme.blush, '#ffffff', 0.74));
     }
     if (theme.ink) {
-      set('--ink-soft', mix(theme.ink, '#ffffff', 0.32));
-      set('--muted', mix(theme.ink, '#ffffff', 0.52));
+      /* Contrast is measured against the darkest of the light surfaces, so the
+         same value is safe on the page, on cards and on cream sections. */
+      var surface = theme.cream || theme.creamLight || '#F7EEE3';
+      set('--ink-soft', readable(mix(theme.ink, '#ffffff', 0.32), surface, 4.5));
+      set('--muted', readable(mix(theme.ink, '#ffffff', 0.5), surface, 4.5));
     }
     if (theme.cream) set('--line', mix(theme.cream, theme.ink || '#2A1512', 0.12));
     if (theme.creamLight) set('--paper', mix(theme.creamLight, '#ffffff', 0.6));
@@ -150,7 +177,22 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
       document.body.insertBefore(bar, document.body.firstChild);
     }
     bar.textContent = announcement.text;
-    document.documentElement.style.setProperty('--ann-h', '38px');
+    measureAnnouncement(bar);
+    if (!measureBound) {
+      measureBound = true;
+      window.addEventListener('resize', function () {
+        var live = document.querySelector('.announce');
+        if (live) measureAnnouncement(live);
+      }, { passive: true });
+    }
+  }
+
+  var measureBound = false;
+  function measureAnnouncement(bar) {
+    bar.style.height = 'auto';
+    var height = Math.max(34, Math.ceil(bar.getBoundingClientRect().height));
+    bar.style.height = '';
+    document.documentElement.style.setProperty('--ann-h', height + 'px');
   }
 
   /* ------------------------------------------------------------- binding */
