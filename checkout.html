@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout · lovebirds</title>
+<meta name="description" content="Delivery details and cash-on-delivery checkout for your lovebirds order.">
+<meta name="theme-color" content="#6E1128">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Checkout · lovebirds">
+<meta property="og:description" content="Delivery details and cash-on-delivery checkout for your lovebirds order.">
+<meta property="og:image" content="assets/img/og-image.svg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Jost:wght@300;400;500&family=Parisienne&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/lovebirds.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="header">
+  <nav class="nav" aria-label="Primary">
+    <a class="nav__brand" href="index.html" aria-label="lovebirds — home">
+      <svg class="mark" viewBox="0 -60 240 180" fill="currentColor" aria-hidden="true"><g transform=" translate(0.0,0.0) scale(1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform=" translate(240.0,0.0) scale(-1.0000,1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform="translate(97.0,-32.2) scale(0.4600)"><path d="M50 88C20 66 8 50 8 34 8 19 19 10 32 10c8 0 14 4 18 10 4-6 10-10 18-10 13 0 24 9 24 24 0 16-12 32-42 54Z" fill="currentColor" opacity="1.0"/></g></svg>
+      <span class="word">lovebirds</span>
+    </a>
+    <ul class="nav__links">
+      <li><a class="nav__link" data-nav href="index.html">Home</a></li>
+      <li><a class="nav__link" data-nav href="categories.html">Categories</a></li>
+      <li><a class="nav__link" data-nav href="contact.html">Contact us</a></li>
+    </ul>
+    <div class="nav__actions">
+      <button class="btn btn--wa btn--sm" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> Chat on WhatsApp</button>
+      <button class="icon-btn icon-btn--wa" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift." aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg></button>
+      <button class="icon-btn" data-cart-open aria-label="Open your cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4.2 8h15.6l-1 12.4a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M8.6 8V6.2a3.4 3.4 0 1 1 6.8 0V8"/></svg><span class="cart-count" data-cart-count>0</span></button>
+      <button class="nav__burger" data-burger aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div class="mobile-menu" id="mobile-menu">
+  <nav class="mobile-menu__links" aria-label="Mobile">
+    <a href="index.html" style="--i:0">Home</a>
+    <a href="categories.html" style="--i:1">Categories</a>
+    <a href="contact.html" style="--i:2">Contact us</a>
+  </nav>
+  <div class="mobile-menu__foot">
+    <button class="btn btn--wa btn--block" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> Chat on WhatsApp</button>
+    <button class="btn btn--ghost btn--block" data-cart-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4.2 8h15.6l-1 12.4a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M8.6 8V6.2a3.4 3.4 0 1 1 6.8 0V8"/></svg> View your cart</button>
+    <p class="mobile-menu__note">Cash on delivery · 2–4 day delivery</p>
+  </div>
+</div>
+<main id="main">
+
+<section class="checkout">
+  <div class="wrap">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M9 6l6 6-6 6"/></svg><a href="categories.html">Shop</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M9 6l6 6-6 6"/></svg><span>Checkout</span></nav>
+    <div class="section-head" data-reveal>
+      <span class="eyebrow">Almost yours</span>
+      <h1>Checkout</h1>
+    </div>
+
+    <div class="empty" data-checkout-empty hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4.2 8h15.6l-1 12.4a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M8.6 8V6.2a3.4 3.4 0 1 1 6.8 0V8"/></svg>
+      <h3>Your cart is empty</h3>
+      <p>Add a gift or two and your order details will show up here.</p>
+      <a class="btn" href="categories.html">Browse gifts</a>
+    </div>
+
+    <div class="checkout__grid" data-checkout-grid>
+      <div class="checkout__main">
+        <form data-checkout novalidate>
+
+          <div class="co-block" data-reveal>
+            <div class="co-block__head">
+              <h2>Delivery</h2>
+              <span class="co-block__note" data-saved-hint hidden>Details filled from last time</span>
+            </div>
+            <div class="co-fields">
+              <div class="field field--select">
+                <label for="country">Country / region</label>
+                <select id="country" name="country" autocomplete="country-name" required></select>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M6 9l6 6 6-6"/></svg>
+                <span class="err" role="alert"></span>
+              </div>
+              <div class="field-row field-row--2">
+                <div class="field">
+                  <label for="firstName">First name</label>
+                  <input id="firstName" name="firstName" type="text" autocomplete="given-name" placeholder="Lea" required>
+                  <span class="err" role="alert"></span>
+                </div>
+                <div class="field">
+                  <label for="lastName">Last name</label>
+                  <input id="lastName" name="lastName" type="text" autocomplete="family-name" placeholder="Haddad" required>
+                  <span class="err" role="alert"></span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="address">Address</label>
+                <input id="address" name="address" type="text" autocomplete="street-address" placeholder="Street and building" required>
+                <span class="err" role="alert"></span>
+              </div>
+              <div class="field">
+                <label for="apartment">Apartment / floor <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+                <input id="apartment" name="apartment" type="text" autocomplete="address-line2" placeholder="4th floor, apt 12">
+              </div>
+              <div class="field">
+                <label for="city">City</label>
+                <input id="city" name="city" type="text" autocomplete="address-level2" placeholder="City" required>
+                <span class="err" role="alert"></span>
+              </div>
+              <div class="field">
+                <label for="phone">Phone number</label>
+                <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="For the courier to call you" required>
+                <span class="err" role="alert"></span>
+              </div>
+              <div class="field">
+                <label for="email">Email address</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" required>
+                <span class="err" role="alert"></span>
+              </div>
+              <label class="check">
+                <input type="checkbox" name="saveInfo" value="1">
+                <span>Save this information for next time</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="co-block" data-reveal>
+            <div class="co-block__head">
+              <h2>Payment</h2>
+              <span class="co-block__note">All transactions are secure</span>
+            </div>
+            <div class="pay-option">
+              <div class="pay-option__top">
+                <span class="pay-option__radio" aria-hidden="true"></span>
+                <span class="pay-option__title">Cash on delivery (COD)</span>
+                <input type="radio" name="payment" value="cod" checked class="sr-only" aria-label="Cash on delivery">
+              </div>
+              <div class="pay-option__body">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M2.8 6.8h18.4v10.4H2.8z"/><circle cx="12" cy="12" r="2.8"/><path d="M6 10v4M18 10v4"/></svg>Pay the courier in cash when your gift arrives. Please have the exact amount ready if you can — our drivers carry little change.
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn--lg btn--block" type="submit" data-complete>Complete order</button>
+          <p class="co-secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M12 2.8 20 6v6c0 4.6-3.3 7.9-8 9.2C7.3 19.9 4 16.6 4 12V6Z"/><path d="M8.8 12.2 11 14.5l4.2-4.4"/></svg><span>We only use your details to deliver this order and to call you if the driver can’t find the door.</span></p>
+        </form>
+      </div>
+
+      <aside class="checkout__aside">
+        <button class="summary__toggle" data-summary-toggle aria-expanded="false">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4.2 8h15.6l-1 12.4a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M8.6 8V6.2a3.4 3.4 0 1 1 6.8 0V8"/></svg> <span data-summary-toggle-label>Show order summary</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M6 9l6 6 6-6"/></svg></span>
+          <strong data-mobile-total>$0.00</strong>
+        </button>
+        <div class="summary" data-reveal="right">
+          <h2>Order summary</h2>
+          <div class="summary__items" data-summary-items></div>
+          <div class="summary__totals">
+            <div class="summary__line"><span>Subtotal · <span data-sum-count>0 items</span></span><span data-sum-subtotal>$0.00</span></div>
+            <div class="summary__line"><span>Delivery</span><span data-sum-shipping>Free</span></div>
+            <div class="summary__line summary__free" data-sum-free hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M2.5 6.5h11v10h-11z"/><path d="M13.5 10h4l3 3v3.5h-7z"/><circle cx="6.5" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg><span data-sum-free-text></span></div>
+            <div class="summary__line summary__line--total"><span>Total</span><strong data-sum-total>$0.00</strong></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand" data-reveal>
+        <svg class="mark" viewBox="0 -60 240 180" fill="currentColor" aria-hidden="true"><g transform=" translate(0.0,0.0) scale(1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform=" translate(240.0,0.0) scale(-1.0000,1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform="translate(97.0,-32.2) scale(0.4600)"><path d="M50 88C20 66 8 50 8 34 8 19 19 10 32 10c8 0 14 4 18 10 4-6 10-10 18-10 13 0 24 9 24 24 0 16-12 32-42 54Z" fill="currentColor" opacity="1.0"/></g></svg>
+        <span class="word">lovebirds</span>
+        <p>Small, careful gifts for couples, friends, family — and everyone in between.</p>
+      </div>
+      <div data-reveal data-delay=".06s">
+        <h4>Shop</h4>
+        <ul class="footer__links">
+          <li><a href="categories.html">All gifts</a></li>
+          <li><a href="categories.html?cat=couples">For couples</a></li>
+          <li><a href="categories.html?cat=friends">For friends</a></li>
+          <li><a href="categories.html?cat=family">For family</a></li>
+          <li><a href="categories.html?cat=everyone">For everyone</a></li>
+        </ul>
+      </div>
+      <div data-reveal data-delay=".12s">
+        <h4>Help</h4>
+        <ul class="footer__links">
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="contact.html#faq">Delivery &amp; returns</a></li>
+          <li><a href="contact.html#faq">Gift wrapping</a></li>
+          <li><a href="checkout.html">Checkout</a></li>
+        </ul>
+      </div>
+      <div data-reveal data-delay=".18s">
+        <h4>Say hello</h4>
+        <ul class="footer__links">
+          <li><a href="mailto:hello@lovebirds.gifts">hello@lovebirds.gifts</a></li>
+          <li>Mon – Sat, 10:00 – 19:00</li>
+        </ul>
+        <button class="btn btn--wa btn--sm mt-3" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> Chat on WhatsApp</button>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© <span data-year>2026</span> lovebirds · Gifts for every kind of love</span>
+      <span class="footer__pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M2.8 6.8h18.4v10.4H2.8z"/><circle cx="12" cy="12" r="2.8"/><path d="M6 10v4M18 10v4"/></svg> Cash on delivery</span>
+    </div>
+  </div>
+  <span class="footer__script" aria-hidden="true">lovebirds</span>
+</footer>
+<script src="assets/js/products.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/checkout.js"></script>
+</body>
+</html>
