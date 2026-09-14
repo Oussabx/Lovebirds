@@ -4,34 +4,36 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gift · lovebirds</title>
-<meta name="description" content="A lovebirds gift, wrapped by hand and delivered in 2–4 days.">
+<meta name="description" content="A lovebirds gift, wrapped by hand.">
 <meta name="theme-color" content="#6E1128">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="Gift · lovebirds">
-<meta property="og:description" content="A lovebirds gift, wrapped by hand and delivered in 2–4 days.">
+<meta property="og:description" content="A lovebirds gift, wrapped by hand.">
 <meta property="og:image" content="assets/img/og-image.svg">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Jost:wght@300;400;500&family=Parisienne&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/lovebirds.css">
+<script src="assets/js/defaults.js"></script>
+<script src="assets/js/content.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="header">
   <nav class="nav" aria-label="Primary">
-    <a class="nav__brand" href="index.html" aria-label="lovebirds — home">
+    <a class="nav__brand" href="index.html" aria-label="Home">
       <svg class="mark" viewBox="0 -60 240 180" fill="currentColor" aria-hidden="true"><g transform=" translate(0.0,0.0) scale(1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform=" translate(240.0,0.0) scale(-1.0000,1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform="translate(97.0,-32.2) scale(0.4600)"><path d="M50 88C20 66 8 50 8 34 8 19 19 10 32 10c8 0 14 4 18 10 4-6 10-10 18-10 13 0 24 9 24 24 0 16-12 32-42 54Z" fill="currentColor" opacity="1.0"/></g></svg>
-      <span class="word">lovebirds</span>
+      <span class="word" data-cms="settings.brand">lovebirds</span>
     </a>
     <ul class="nav__links">
-      <li><a class="nav__link" data-nav href="index.html">Home</a></li>
-      <li><a class="nav__link" data-nav href="categories.html">Categories</a></li>
-      <li><a class="nav__link" data-nav href="contact.html">Contact us</a></li>
+      <li><a class="nav__link" data-nav href="index.html" data-cms-href="nav.0.href"><span data-cms="nav.0.label">Home</span></a></li>
+      <li><a class="nav__link" data-nav href="categories.html" data-cms-href="nav.1.href"><span data-cms="nav.1.label">Categories</span></a></li>
+      <li><a class="nav__link" data-nav href="contact.html" data-cms-href="nav.2.href"><span data-cms="nav.2.label">Contact us</span></a></li>
     </ul>
     <div class="nav__actions">
-      <button class="btn btn--wa btn--sm" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> Chat on WhatsApp</button>
-      <button class="icon-btn icon-btn--wa" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift." aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg></button>
+      <button class="btn btn--wa btn--sm" data-wa data-wa-greeting><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> <span data-cms="navWhatsappLabel">Chat on WhatsApp</span></button>
+      <button class="icon-btn icon-btn--wa" data-wa data-wa-greeting aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg></button>
       <button class="icon-btn" data-cart-open aria-label="Open your cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4.2 8h15.6l-1 12.4a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M8.6 8V6.2a3.4 3.4 0 1 1 6.8 0V8"/></svg><span class="cart-count" data-cart-count>0</span></button>
       <button class="nav__burger" data-burger aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
         <span></span><span></span><span></span>
@@ -42,25 +44,25 @@
 
 <div class="mobile-menu" id="mobile-menu">
   <nav class="mobile-menu__links" aria-label="Mobile">
-    <a href="index.html" style="--i:0">Home</a>
-    <a href="categories.html" style="--i:1">Categories</a>
-    <a href="contact.html" style="--i:2">Contact us</a>
+    <a href="index.html" style="--i:0" data-cms-href="nav.0.href"><span data-cms="nav.0.label">Home</span></a>
+    <a href="categories.html" style="--i:1" data-cms-href="nav.1.href"><span data-cms="nav.1.label">Categories</span></a>
+    <a href="contact.html" style="--i:2" data-cms-href="nav.2.href"><span data-cms="nav.2.label">Contact us</span></a>
   </nav>
   <div class="mobile-menu__foot">
-    <button class="btn btn--wa btn--block" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> Chat on WhatsApp</button>
+    <button class="btn btn--wa btn--block" data-wa data-wa-greeting><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> <span data-cms="navWhatsappLabel">Chat on WhatsApp</span></button>
     <button class="btn btn--ghost btn--block" data-cart-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M4.2 8h15.6l-1 12.4a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M8.6 8V6.2a3.4 3.4 0 1 1 6.8 0V8"/></svg> View your cart</button>
-    <p class="mobile-menu__note">Cash on delivery · 2–4 day delivery</p>
+    <p class="mobile-menu__note" data-cms="settings.paymentNote">Cash on delivery</p>
   </div>
 </div>
 <main id="main">
 
 <section class="pdp" data-pdp></section>
 
-<section class="section section--cream">
+<section class="section section--cream" data-related-section>
   <div class="wrap">
     <div class="section-head" data-reveal>
-      <span class="eyebrow">Pairs well with</span>
-      <h2>You might also love</h2>
+      <span class="eyebrow" data-cms="product.relatedEyebrow">Pairs well with</span>
+      <h2 data-cms="product.relatedTitle">You might also love</h2>
     </div>
     <div class="grid grid--4" data-related></div>
   </div>
@@ -72,12 +74,12 @@
     <div class="footer__grid">
       <div class="footer__brand" data-reveal>
         <svg class="mark" viewBox="0 -60 240 180" fill="currentColor" aria-hidden="true"><g transform=" translate(0.0,0.0) scale(1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform=" translate(240.0,0.0) scale(-1.0000,1.0000)"><polygon points="34,44 0,8 26,88" fill="currentColor"/><ellipse cx="62" cy="64" rx="36" ry="40" fill="currentColor" transform="rotate(-10 62 64)"/><circle cx="78" cy="36" r="22" fill="currentColor"/><polygon points="96,33 119,42 96,51" fill="currentColor"/><circle cx="86" cy="30" r="4.2" fill="#FCF8F2"/></g><g transform="translate(97.0,-32.2) scale(0.4600)"><path d="M50 88C20 66 8 50 8 34 8 19 19 10 32 10c8 0 14 4 18 10 4-6 10-10 18-10 13 0 24 9 24 24 0 16-12 32-42 54Z" fill="currentColor" opacity="1.0"/></g></svg>
-        <span class="word">lovebirds</span>
-        <p>Small, careful gifts for couples, friends, family — and everyone in between.</p>
+        <span class="word" data-cms="settings.brand">lovebirds</span>
+        <p data-cms="footer.about">Small, careful gifts for couples, friends, family — and everyone in between.</p>
       </div>
       <div data-reveal data-delay=".06s">
-        <h4>Shop</h4>
-        <ul class="footer__links">
+        <h4 data-cms="footer.columns.0.title">Shop</h4>
+        <ul class="footer__links" data-footer-links="0">
           <li><a href="categories.html">All gifts</a></li>
           <li><a href="categories.html?cat=couples">For couples</a></li>
           <li><a href="categories.html?cat=friends">For friends</a></li>
@@ -86,8 +88,8 @@
         </ul>
       </div>
       <div data-reveal data-delay=".12s">
-        <h4>Help</h4>
-        <ul class="footer__links">
+        <h4 data-cms="footer.columns.1.title">Help</h4>
+        <ul class="footer__links" data-footer-links="1">
           <li><a href="contact.html">Contact us</a></li>
           <li><a href="contact.html#faq">Delivery &amp; returns</a></li>
           <li><a href="contact.html#faq">Gift wrapping</a></li>
@@ -95,22 +97,21 @@
         </ul>
       </div>
       <div data-reveal data-delay=".18s">
-        <h4>Say hello</h4>
+        <h4 data-cms="footer.contactTitle">Say hello</h4>
         <ul class="footer__links">
-          <li><a href="mailto:hello@lovebirds.gifts">hello@lovebirds.gifts</a></li>
-          <li>Mon – Sat, 10:00 – 19:00</li>
+          <li><a href="mailto:hello@lovebirds.gifts" data-mail><span data-cms="settings.email">hello@lovebirds.gifts</span></a></li>
+          <li><span data-cms="settings.hours">Mon – Sat, 10:00 – 19:00</span></li>
         </ul>
-        <button class="btn btn--wa btn--sm mt-3" data-wa data-wa-text="Hi lovebirds! I’d like some help choosing a gift."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> Chat on WhatsApp</button>
+        <button class="btn btn--wa btn--sm mt-3" data-wa data-wa-greeting><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8.6 11.4h.01M12 11.4h.01M15.4 11.4h.01"/></svg> <span data-cms="navWhatsappLabel">Chat on WhatsApp</span></button>
       </div>
     </div>
     <div class="footer__bottom">
-      <span>© <span data-year>2026</span> lovebirds · Gifts for every kind of love</span>
-      <span class="footer__pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M2.8 6.8h18.4v10.4H2.8z"/><circle cx="12" cy="12" r="2.8"/><path d="M6 10v4M18 10v4"/></svg> Cash on delivery</span>
+      <span>© <span data-year>2026</span> <span data-cms="settings.brand">lovebirds</span> · <span data-cms="footer.bottomNote">Gifts for every kind of love</span></span>
+      <span class="footer__pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ><path d="M2.8 6.8h18.4v10.4H2.8z"/><circle cx="12" cy="12" r="2.8"/><path d="M6 10v4M18 10v4"/></svg> <span data-cms="settings.paymentNote">Cash on delivery</span></span>
     </div>
   </div>
-  <span class="footer__script" aria-hidden="true">lovebirds</span>
+  <span class="footer__script" aria-hidden="true" data-cms="settings.brand">lovebirds</span>
 </footer>
-<script src="assets/js/products.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/product.js"></script>
 </body>

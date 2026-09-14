@@ -1,4 +1,4 @@
-/* Categories / shop page — filtering + sorting */
+/* Categories / shop page — filtering and sorting over the live catalogue */
 (function () {
   const { $, $$, productCard, observe, refreshParallax } = window.LB;
 
@@ -13,21 +13,12 @@
 
   const params = new URLSearchParams(location.search);
   let active = params.get('cat') || 'all';
-  if (active !== 'all' && !getCategory(active)) active = 'all';
-
-  const BLURBS = {
-    all: 'Every gift we make, in one place — small things that say the big thing.',
-    couples: 'For the person who knows how you take your coffee.',
-    friends: 'For the people who picked you back.',
-    family: 'For the ones who were there first.',
-    everyone: 'For no reason at all, which is the best reason.'
-  };
 
   function chips() {
-    const list = [{ id: 'all', name: 'All gifts' }].concat(CATEGORIES);
-    chipsBox.innerHTML = '<span class="filters__label">Shop for</span>' + list.map(c =>
-      '<button class="chip' + (c.id === active ? ' is-active' : '') + '" data-cat="' + c.id + '">' + c.name + '</button>'
-    ).join('');
+    const shop = COPY.shop || {};
+    const list = [{ id: 'all', name: shop.allLabel || 'All gifts' }].concat(CATEGORIES);
+    chipsBox.innerHTML = '<span class="filters__label">' + (shop.filterLabel || 'Shop for') + '</span>' +
+      list.map(c => '<button class="chip' + (c.id === active ? ' is-active' : '') + '" data-cat="' + c.id + '">' + c.name + '</button>').join('');
   }
 
   function sorted(list) {
@@ -40,11 +31,21 @@
   }
 
   function render() {
+    const shop = COPY.shop || {};
+    if (active !== 'all' && !getCategory(active)) active = 'all';
+
     const list = sorted(active === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === active));
-    grid.innerHTML = list.map(p => productCard(p)).join('');
+    grid.innerHTML = list.length
+      ? list.map(p => productCard(p)).join('')
+      : '<div class="empty" style="grid-column:1/-1">' + window.LB.ICONS.heartLine +
+        '<h3>Nothing here yet</h3><p>This category is waiting for its first gift.</p></div>';
+
     if (countEl) countEl.textContent = list.length + (list.length === 1 ? ' gift' : ' gifts');
-    if (titleEl) titleEl.textContent = active === 'all' ? 'All gifts' : categoryName(active);
-    if (blurbEl) blurbEl.textContent = BLURBS[active] || BLURBS.all;
+    if (titleEl) titleEl.textContent = active === 'all' ? (shop.title || 'All gifts') : categoryName(active);
+    if (blurbEl) {
+      const category = getCategory(active);
+      blurbEl.textContent = active === 'all' ? (shop.lede || '') : ((category && category.intro) || shop.lede || '');
+    }
     observe(grid);
     refreshParallax();
   }
@@ -54,13 +55,13 @@
     if (!chip) return;
     active = chip.dataset.cat;
     $$('.chip', chipsBox).forEach(c => c.classList.toggle('is-active', c.dataset.cat === active));
-    const url = active === 'all' ? location.pathname : location.pathname + '?cat=' + active;
-    history.replaceState({}, '', url);
+    history.replaceState({}, '', active === 'all' ? location.pathname : location.pathname + '?cat=' + active);
     render();
   });
 
   if (sortEl) sortEl.addEventListener('change', render);
 
-  chips();
-  render();
+  function boot() { chips(); render(); }
+  LBContent.ready.then(boot);
+  document.addEventListener('content:change', boot);
 })();

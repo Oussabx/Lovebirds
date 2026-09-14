@@ -34,10 +34,18 @@
   };
 
   /* ------------------------------------------------------------- helpers */
-  const money = n => CONFIG.currency + Number(n).toFixed(2);
+  const copy = (path, fallback) =>
+    (window.LBContent ? window.LBContent.get(path, fallback) : fallback);
+
+  function money(n) {
+    const value = Number(n).toFixed(2);
+    return CONFIG.currencyPosition === 'after'
+      ? value + ' ' + CONFIG.currency
+      : CONFIG.currency + value;
+  }
 
   function waLink(text) {
-    if (!CONFIG.whatsapp) return null;
+    if (!CONFIG || !CONFIG.whatsapp) return null;
     return 'https://wa.me/' + CONFIG.whatsapp.replace(/\D/g, '') + (text ? '?text=' + encodeURIComponent(text) : '');
   }
 
@@ -196,22 +204,24 @@
   }
 
   /* ------------------------------------------------------------- cart drawer */
-  const drawerHTML = [
-    '<div class="overlay" data-overlay hidden></div>',
-    '<aside class="cart" id="cart-drawer" role="dialog" aria-modal="true" aria-label="Your cart" aria-hidden="true">',
-    '<header class="cart__head">',
-    '<div><h2>Your cart</h2><span class="count" data-cart-count-text>0 items</span></div>',
-    '<button class="icon-btn" data-cart-close aria-label="Close cart">' + ICONS.close + '</button>',
-    '</header>',
-    '<div class="cart__body" data-cart-body></div>',
-    '<footer class="cart__foot" data-cart-foot hidden>',
-    '<div class="cart__ship" data-cart-ship></div>',
-    '<div class="cart__row"><span>Subtotal</span><strong data-cart-subtotal>' + money(0) + '</strong></div>',
-    '<p class="cart__note">Shipping calculated at checkout · Cash on delivery</p>',
-    '<a class="btn btn--block btn--lg" href="checkout.html">Checkout ' + ICONS.arrow + '</a>',
-    '<button class="btn btn--ghost btn--block mt-3" data-cart-close style="margin-top:12px">Continue shopping</button>',
-    '</footer></aside>'
-  ].join('');
+  function drawerHTML() {
+    return [
+      '<div class="overlay" data-overlay hidden></div>',
+      '<aside class="cart" id="cart-drawer" role="dialog" aria-modal="true" aria-label="' + copy('cart.title', 'Your cart') + '" aria-hidden="true">',
+      '<header class="cart__head">',
+      '<div><h2>' + copy('cart.title', 'Your cart') + '</h2><span class="count" data-cart-count-text>0 items</span></div>',
+      '<button class="icon-btn" data-cart-close aria-label="Close cart">' + ICONS.close + '</button>',
+      '</header>',
+      '<div class="cart__body" data-cart-body></div>',
+      '<footer class="cart__foot" data-cart-foot hidden>',
+      '<div class="cart__ship" data-cart-ship></div>',
+      '<div class="cart__row"><span>' + copy('cart.subtotalLabel', 'Subtotal') + '</span><strong data-cart-subtotal>' + money(0) + '</strong></div>',
+      '<p class="cart__note">' + copy('cart.note', '') + '</p>',
+      '<a class="btn btn--block btn--lg" href="checkout.html">' + copy('cart.checkoutLabel', 'Checkout') + ' ' + ICONS.arrow + '</a>',
+      '<button class="btn btn--ghost btn--block mt-3" data-cart-close style="margin-top:12px">' + copy('cart.continueLabel', 'Continue shopping') + '</button>',
+      '</footer></aside>'
+    ].join('');
+  }
 
   let lastFocus = null;
 
@@ -231,14 +241,17 @@
       }
     });
     const label = $('[data-cart-count-text]');
-    if (label) label.textContent = count + (count === 1 ? ' item' : ' items');
+    if (label) {
+      label.textContent = count + ' ' +
+        (count === 1 ? copy('cart.itemWord', 'item') : copy('cart.itemsWord', 'items'));
+    }
 
     const foot = $('[data-cart-foot]');
     if (!lines.length) {
       body.innerHTML = '<div class="empty">' + ICONS.heartLine +
-        '<h3>Nothing in here yet</h3>' +
-        '<p>Every good gift starts with a browse. Have a look around.</p>' +
-        '<a class="btn btn--ghost" href="categories.html">Shop gifts</a></div>';
+        '<h3>' + copy('cart.emptyTitle', 'Nothing in here yet') + '</h3>' +
+        '<p>' + copy('cart.emptyText', '') + '</p>' +
+        '<a class="btn btn--ghost" href="categories.html">' + copy('cart.browseLabel', 'Shop gifts') + '</a></div>';
       if (foot) foot.hidden = true;
       return;
     }
@@ -270,9 +283,12 @@
     if (ship) {
       const left = CONFIG.freeShippingOver - sub;
       const pct = Math.min(100, (sub / CONFIG.freeShippingOver) * 100);
-      ship.innerHTML = left > 0
-        ? '<p>' + money(left) + ' away from free delivery</p><div class="cart__ship-bar"><i style="width:' + pct + '%"></i></div>'
-        : '<p>' + ICONS.check + ' You have free delivery</p><div class="cart__ship-bar"><i style="width:100%"></i></div>';
+      if (!CONFIG.freeShippingOver) { ship.innerHTML = ''; }
+      else {
+        ship.innerHTML = left > 0
+          ? '<p>' + money(left) + ' ' + copy('cart.freeAway', 'away from free delivery') + '</p><div class="cart__ship-bar"><i style="width:' + pct + '%"></i></div>'
+          : '<p>' + ICONS.check + ' ' + copy('cart.freeDone', 'You have free delivery') + '</p><div class="cart__ship-bar"><i style="width:100%"></i></div>';
+      }
     }
   }
 
@@ -304,6 +320,21 @@
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
+  /* ------------------------------------------------------------- chrome */
+  function applyChrome() {
+    $$('[data-footer-links]').forEach(list => {
+      const column = copy('footer.columns.' + list.dataset.footerLinks, null);
+      if (!column || !Array.isArray(column.links)) return;
+      list.innerHTML = column.links
+        .map(link => '<li><a href="' + link.href + '">' + link.label + '</a></li>').join('');
+    });
+    const mail = copy('settings.email', '');
+    $$('[data-mail]').forEach(a => { if (mail) a.setAttribute('href', 'mailto:' + mail); });
+    $$('[data-wa]').forEach(btn => {
+      btn.classList.toggle('is-unset', !CONFIG.whatsapp);
+    });
+  }
+
   /* ------------------------------------------------------------- nav */
   function initNav() {
     const burger = $('[data-burger]');
@@ -331,10 +362,11 @@
   function init() {
     // inject drawer + overlay once per page
     const holder = document.createElement('div');
-    holder.innerHTML = drawerHTML;
+    holder.innerHTML = drawerHTML();
     while (holder.firstChild) document.body.appendChild(holder.firstChild);
 
     initNav();
+    applyChrome();
     renderCart();
     observe();
     collectParallax();
@@ -343,6 +375,7 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', () => { collectParallax(); onScroll(); }, { passive: true });
     document.addEventListener('cart:change', renderCart);
+    document.addEventListener('content:change', () => { applyChrome(); renderCart(); });
 
     // year stamps
     $$('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
@@ -355,7 +388,7 @@
         const p = getProduct(add.dataset.add);
         if (!p) return;
         Cart.add(p.id, add.dataset.qty || 1);
-        toast(p.name + ' added to your cart');
+        toast(p.name + ' ' + copy('cart.addedToast', 'added to your cart'));
         openCart();
         return;
       }
@@ -365,7 +398,7 @@
         const on = Favs.toggle(fav.dataset.fav);
         fav.classList.toggle('is-on', on);
         fav.setAttribute('aria-pressed', on ? 'true' : 'false');
-        toast(on ? 'Saved to your favourites' : 'Removed from favourites');
+        toast(on ? copy('cart.savedToast', 'Saved') : copy('cart.unsavedToast', 'Removed'));
         return;
       }
       if (e.target.closest('[data-cart-open]')) { e.preventDefault(); openCart(); return; }
@@ -376,13 +409,15 @@
       const dec = e.target.closest('[data-dec]');
       if (dec) { const l = Cart.lines().find(x => x.id === dec.dataset.dec); if (l) Cart.setQty(l.id, l.qty - 1); return; }
       const rm = e.target.closest('[data-remove]');
-      if (rm) { Cart.remove(rm.dataset.remove); toast('Removed from your cart'); return; }
+      if (rm) { Cart.remove(rm.dataset.remove); toast(copy('cart.removedToast', 'Removed')); return; }
 
       const wa = e.target.closest('[data-wa]');
       if (wa) {
-        const link = waLink(wa.dataset.waText || '');
+        const text = wa.dataset.waText ||
+          (wa.hasAttribute('data-wa-greeting') ? copy('settings.whatsappGreeting', '') : '');
+        const link = waLink(text);
         if (link) { window.open(link, '_blank', 'noopener'); }
-        else { e.preventDefault(); toast('WhatsApp ordering is coming soon — add to cart meanwhile', ICONS.chat); }
+        else { e.preventDefault(); toast(copy('cart.whatsappSoon', 'WhatsApp is not connected yet'), ICONS.chat); }
       }
     });
 
@@ -419,7 +454,7 @@
   /* ------------------------------------------------------------- export */
   window.LB = {
     $: $, $$: $$, ICONS: ICONS, money: money, waLink: waLink,
-    Cart: Cart, Favs: Favs, toast: toast, productCard: productCard,
+    Cart: Cart, Favs: Favs, toast: toast, productCard: productCard, copy: copy,
     observe: observe, refreshParallax: collectParallax,
     openCart: openCart, closeCart: closeCart, reduced: reduced
   };

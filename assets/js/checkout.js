@@ -1,4 +1,4 @@
-/* Checkout — delivery details, cash on delivery, order summary */
+/* Checkout — delivery details, cash on delivery, order placement */
 (function () {
   const { $, $$, ICONS, money, Cart, toast } = window.LB;
 
@@ -8,31 +8,38 @@
   const CUSTOMER_KEY = 'lovebirds.customer.v1';
   const ORDER_KEY = 'lovebirds.lastOrder.v1';
 
-  const COUNTRIES = [
-    'Lebanon', 'Algeria', 'Argentina', 'Australia', 'Austria', 'Bahrain', 'Belgium', 'Brazil', 'Canada',
-    'Chile', 'Colombia', 'Cyprus', 'Czechia', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Ghana',
-    'Greece', 'India', 'Indonesia', 'Iraq', 'Ireland', 'Italy', 'Japan', 'Jordan', 'Kenya', 'Kuwait',
-    'Libya', 'Malaysia', 'Malta', 'Mauritania', 'Mexico', 'Morocco', 'Netherlands', 'New Zealand',
-    'Nigeria', 'Norway', 'Oman', 'Pakistan', 'Palestine', 'Philippines', 'Poland', 'Portugal', 'Qatar',
-    'Romania', 'Saudi Arabia', 'Senegal', 'Singapore', 'South Africa', 'Spain', 'Sudan', 'Sweden',
-    'Switzerland', 'Syria', 'Tunisia', 'Türkiye', 'United Arab Emirates', 'United Kingdom',
-    'United States', 'Yemen', 'Other'
-  ];
+  const itemsBox = $('[data-summary-items]');
+  const emptyBox = $('[data-checkout-empty]');
+  const gridBox = $('[data-checkout-grid]');
 
-  /* ---------------------------------------------------------- country list */
-  const country = $('#country');
-  if (country) {
-    country.innerHTML = '<option value="" disabled selected>Select a country</option>' +
-      COUNTRIES.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+  /* ---------------------------------------------------------- fields */
+  function fillCountries() {
+    const country = $('#country');
+    if (!country) return;
+    const chosen = country.value;
+    const list = (CONFIG.countries || []).slice();
+    country.innerHTML = '<option value="" disabled' + (chosen ? '' : ' selected') + '>Select a country</option>' +
+      list.map(c => '<option value="' + c + '"' + (c === chosen ? ' selected' : '') + '>' + c + '</option>').join('');
   }
 
-  /* ---------------------------------------------------------- saved details */
-  let saved = null;
-  try { saved = JSON.parse(localStorage.getItem(CUSTOMER_KEY)); } catch (e) { saved = null; }
-  if (saved) {
-    Object.keys(saved).forEach(k => {
-      const field = form.elements[k];
-      if (field && typeof saved[k] === 'string') field.value = saved[k];
+  function fillLabels() {
+    const labels = (COPY.checkout && COPY.checkout.labels) || {};
+    Object.keys(labels).forEach(name => {
+      const label = document.querySelector('label[for="' + name + '"]');
+      if (!label) return;
+      const optional = label.querySelector('span');
+      label.textContent = labels[name];
+      if (optional) label.appendChild(optional);
+    });
+  }
+
+  function restoreSaved() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(CUSTOMER_KEY)); } catch (e) { saved = null; }
+    if (!saved) return;
+    Object.keys(saved).forEach(key => {
+      const field = form.elements[key];
+      if (field && typeof saved[key] === 'string' && !field.value) field.value = saved[key];
     });
     const box = form.elements['saveInfo'];
     if (box) box.checked = true;
@@ -41,10 +48,6 @@
   }
 
   /* ---------------------------------------------------------- summary */
-  const itemsBox = $('[data-summary-items]');
-  const emptyBox = $('[data-checkout-empty]');
-  const gridBox = $('[data-checkout-grid]');
-
   function renderSummary() {
     const lines = Cart.lines();
 
@@ -71,18 +74,20 @@
     set('[data-sum-subtotal]', money(sub));
     set('[data-sum-shipping]', ship === 0 ? 'Free' : money(ship));
     set('[data-sum-total]', money(tot));
-    set('[data-sum-count]', Cart.count() + (Cart.count() === 1 ? ' item' : ' items'));
+    set('[data-sum-count]', Cart.count() + ' ' + (Cart.count() === 1 ? 'item' : 'items'));
     set('[data-mobile-total]', money(tot));
 
     const free = $('[data-sum-free]');
     if (free) {
-      const left = CONFIG.freeShippingOver - sub;
-      free.hidden = left <= 0;
+      const left = (CONFIG.freeShippingOver || 0) - sub;
+      free.hidden = !CONFIG.freeShippingOver || left <= 0;
       const txt = $('[data-sum-free-text]');
       if (txt) txt.textContent = 'Add ' + money(Math.max(0, left)) + ' more for free delivery';
     }
     const cta = $('[data-complete]');
-    if (cta) cta.innerHTML = 'Complete order · ' + money(tot);
+    if (cta && !cta.dataset.busy) {
+      cta.innerHTML = ((COPY.checkout && COPY.checkout.completeLabel) || 'Complete order') + ' · ' + money(tot);
+    }
   }
 
   /* ---------------------------------------------------------- mobile summary */
@@ -109,15 +114,13 @@
                  test: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) }
   };
 
-  function fieldOf(input) { return input.closest('.field'); }
-
   function validate(name, showError) {
     const input = form.elements[name];
     const rule = RULES[name];
     if (!input || !rule) return true;
     const value = (input.value || '').trim();
     const ok = value !== '' && (!rule.test || rule.test(value));
-    const wrap = fieldOf(input);
+    const wrap = input.closest('.field');
     if (wrap) {
       wrap.classList.toggle('is-invalid', !ok && showError !== false);
       const err = wrap.querySelector('.err');
@@ -132,20 +135,35 @@
     if (!input) return;
     input.addEventListener('blur', () => { if (input.value.trim()) validate(name); });
     input.addEventListener('input', () => {
-      const wrap = fieldOf(input);
+      const wrap = input.closest('.field');
       if (wrap && wrap.classList.contains('is-invalid')) validate(name);
     });
     if (input.tagName === 'SELECT') input.addEventListener('change', () => validate(name));
   });
 
   /* ---------------------------------------------------------- submit */
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  function localOrder(customer, note) {
+    return {
+      id: 'LB-' + Date.now().toString(36).slice(-5).toUpperCase() + Math.floor(Math.random() * 90 + 10),
+      placedAt: new Date().toISOString(),
+      status: 'new',
+      payment: CONFIG.paymentNote || 'Cash on delivery',
+      currency: CONFIG.currency,
+      customer: customer,
+      note: note,
+      lines: Cart.lines().map(l => ({ id: l.id, name: l.product.name, qty: l.qty, price: l.product.price, total: l.total })),
+      subtotal: Cart.subtotal(),
+      shipping: Cart.shipping(),
+      total: Cart.total(),
+      offline: true
+    };
+  }
 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
     if (!Cart.count()) { renderSummary(); return; }
 
-    const names = Object.keys(RULES);
-    const bad = names.filter(n => !validate(n));
+    const bad = Object.keys(RULES).filter(n => !validate(n));
     if (bad.length) {
       const first = form.elements[bad[0]];
       first.focus();
@@ -154,38 +172,75 @@
       return;
     }
 
-    const data = {};
-    ['country', 'firstName', 'lastName', 'address', 'apartment', 'city', 'phone', 'email'].forEach(k => {
-      const el = form.elements[k];
-      data[k] = el ? el.value.trim() : '';
+    const customer = {};
+    ['country', 'firstName', 'lastName', 'address', 'apartment', 'city', 'phone', 'email'].forEach(key => {
+      const el = form.elements[key];
+      customer[key] = el ? el.value.trim() : '';
     });
+    const note = form.elements['note'] ? form.elements['note'].value.trim() : '';
 
-    const wantsSave = form.elements['saveInfo'] && form.elements['saveInfo'].checked;
     try {
-      if (wantsSave) localStorage.setItem(CUSTOMER_KEY, JSON.stringify(data));
-      else localStorage.removeItem(CUSTOMER_KEY);
+      if (form.elements['saveInfo'] && form.elements['saveInfo'].checked) {
+        localStorage.setItem(CUSTOMER_KEY, JSON.stringify(customer));
+      } else {
+        localStorage.removeItem(CUSTOMER_KEY);
+      }
     } catch (err) {}
 
-    const order = {
-      id: 'LB-' + Date.now().toString(36).slice(-5).toUpperCase() + Math.floor(Math.random() * 90 + 10),
-      placedAt: new Date().toISOString(),
-      payment: 'Cash on delivery',
-      customer: data,
-      lines: Cart.lines().map(l => ({ id: l.id, name: l.product.name, qty: l.qty, price: l.product.price, total: l.total })),
-      subtotal: Cart.subtotal(),
-      shipping: Cart.shipping(),
-      total: Cart.total()
-    };
+    const button = $('[data-complete]');
+    const restore = button ? button.innerHTML : '';
+    if (button) {
+      button.dataset.busy = '1';
+      button.setAttribute('aria-disabled', 'true');
+      button.innerHTML = 'Placing your order…';
+    }
+
+    let order = null;
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: customer,
+          note: note,
+          items: Cart.items().map(i => ({ id: i.id, qty: i.qty }))
+        })
+      });
+
+      if (res.status === 404) {
+        order = localOrder(customer, note);               // no backend deployed
+      } else {
+        const payload = await res.json().catch(() => null);
+        if (res.ok && payload && payload.ok && payload.order) {
+          order = payload.order;
+        } else {
+          const message = (payload && payload.error) || 'We could not place that order. Please try again.';
+          toast(message, ICONS.close);
+          if (button) {
+            delete button.dataset.busy;
+            button.removeAttribute('aria-disabled');
+            button.innerHTML = restore;
+          }
+          return;
+        }
+      }
+    } catch (err) {
+      order = localOrder(customer, note);                 // offline or API unreachable
+    }
 
     try { localStorage.setItem(ORDER_KEY, JSON.stringify(order)); } catch (err) {}
-
-    const btn = $('[data-complete]');
-    if (btn) { btn.setAttribute('aria-disabled', 'true'); btn.innerHTML = 'Placing your order…'; }
-
     Cart.clear();
-    setTimeout(() => { location.href = 'order-confirmed.html'; }, 550);
+    setTimeout(() => { location.href = 'order-confirmed.html'; }, 450);
   });
 
+  function boot() {
+    fillCountries();
+    fillLabels();
+    restoreSaved();
+    renderSummary();
+  }
+
   document.addEventListener('cart:change', renderSummary);
-  renderSummary();
+  document.addEventListener('content:change', boot);
+  LBContent.ready.then(boot);
 })();
