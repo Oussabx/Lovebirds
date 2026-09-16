@@ -84,8 +84,13 @@
     }
   };
 
+  let previewItems = null;
+
   const Cart = {
-    items() { return store.read().filter(i => getProduct(i.id)); },
+    items() {
+      const source = previewItems || store.read();
+      return source.filter(i => getProduct(i.id));
+    },
     lines() {
       return this.items().map(i => {
         const p = getProduct(i.id);
@@ -452,6 +457,10 @@
   window.LB = {
     $: $, $$: $$, ICONS: ICONS, money: money, waLink: waLink,
     Cart: Cart, Favs: Favs, toast: toast, productCard: productCard, copy: copy,
+    previewCart: (items) => {
+      previewItems = Array.isArray(items) && items.length ? items : null;
+      document.dispatchEvent(new CustomEvent('cart:change'));
+    },
     observe: observe, refreshParallax: collectParallax,
     openCart: openCart, closeCart: closeCart, reduced: reduced
   };

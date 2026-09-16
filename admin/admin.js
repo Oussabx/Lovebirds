@@ -29,6 +29,7 @@
     close: SVG('<path d="M6 6l12 12M18 6 6 18"/>'),
     plus: SVG('<path d="M12 5v14M5 12h14"/>'),
     refresh: SVG('<path d="M20 11a8 8 0 1 0-1.2 5.3"/><path d="M20 5.5V11h-5.5"/>'),
+    chevron: SVG('<path d="M6 9l6 6 6-6"/>'),
     chat: SVG('<path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3.4 21l1.9-5.6A8.4 8.4 0 1 1 21 11.5Z"/>'),
     download: SVG('<path d="M12 4v11M7.5 11 12 15.5 16.5 11"/><path d="M5 19.5h14"/>')
   };
@@ -349,6 +350,11 @@
     }
 
     const views = window.__LBADMIN.views || {};
+    if (state.view === 'content' && views.refreshCms && $('[data-cms-editor]')) {
+      views.refreshCms();
+      refreshSaveState();
+      return;
+    }
     $('[data-view]').innerHTML = (views[state.view] || viewOverview)();
     refreshSaveState();
     if (views.afterRender) views.afterRender(state.view);

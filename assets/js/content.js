@@ -294,7 +294,7 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (payload) {
         clearTimeout(timer);
-        if (!payload || !payload.ok) { settle(); return; }
+        if (!payload || !payload.ok || previewLocked) { settle(); return; }
         if (payload.content) {
           if (!stored || JSON.stringify(stored.content) !== JSON.stringify(payload.content)) {
             apply(payload.content, 'api');
@@ -307,6 +307,68 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
         settle();
       })
       .catch(function () { clearTimeout(timer); settle(); });
+  }
+
+  /* ------------------------------------------------------------- live preview
+     The dashboard shows each page in an iframe and posts unsaved edits into it,
+     so you can see the section you are editing as you type. */
+  var previewLocked = false;
+
+  function whenReady(fn) {
+    var tries = 0;
+    (function attempt() {
+      if (window.LB && document.body) return fn();
+      if (tries++ > 60) return;
+      setTimeout(attempt, 50);
+    })();
+  }
+
+  function enterPreviewMode() {
+    if (document.getElementById('lb-preview-style')) return;
+    previewLocked = true;
+    var style = document.createElement('style');
+    style.id = 'lb-preview-style';
+    style.textContent =
+      '[data-reveal],.stagger > *{opacity:1 !important;transform:none !important;clip-path:none !important}' +
+      '.split-line > span{transform:none !important}' +
+      'html{scroll-behavior:auto}' +
+      '[data-section-id]{scroll-margin-top:96px}' +
+      '.lb-focus{position:relative}' +
+      '.lb-focus::after{content:"";position:absolute;inset:-6px;border:2px dashed var(--wine);' +
+      'border-radius:10px;pointer-events:none;z-index:60;animation:lb-focus-in .5s ease}' +
+      '@keyframes lb-focus-in{from{opacity:0}to{opacity:1}}';
+    document.head.appendChild(style);
+    document.documentElement.classList.add('is-preview');
+  }
+
+  function focusSection(id) {
+    whenReady(function () {
+      var previous = document.querySelector('.lb-focus');
+      if (previous) previous.classList.remove('lb-focus');
+      var target = id ? document.querySelector('[data-section-id="' + id + '"]') : null;
+      if (!target) return;
+      target.classList.add('lb-focus');
+      var top = target.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo(0, Math.max(0, top));
+    });
+  }
+
+  function initPreview() {
+    if (window.parent === window) return;
+    window.addEventListener('message', function (event) {
+      if (event.origin !== location.origin) return;
+      var data = event.data || {};
+      if (data.type !== 'lb:preview') return;
+      enterPreviewMode();
+      if (data.content) apply(data.content, 'preview');
+      whenReady(function () {
+        if (data.cart && window.LB.previewCart) window.LB.previewCart(data.cart);
+        if (data.openCart && window.LB.openCart) window.LB.openCart();
+        if (data.closeCart && window.LB.closeCart) window.LB.closeCart();
+        if (data.focus) focusSection(data.focus);
+      });
+    });
+    try { window.parent.postMessage({ type: 'lb:preview-ready' }, location.origin); } catch (e) {}
   }
 
   /* ------------------------------------------------------------- export */
@@ -324,6 +386,7 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
 
   apply(null, 'defaults');
   load();
+  initPreview();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {

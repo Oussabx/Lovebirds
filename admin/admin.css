@@ -273,3 +273,92 @@ ul{margin:0;padding:0;list-style:none}
   .topbar__actions{width:100%;justify-content:flex-end}
   .list__row{flex-wrap:wrap}
 }
+
+/* ------------------------------------------------------------- text & pages */
+.cms{display:grid;gap:16px}
+
+.cms__tabs{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;
+  scrollbar-width:thin;-webkit-overflow-scrolling:touch;
+}
+.cms__tab{
+  flex:none;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);
+  border-radius:999px;padding:10px 18px;min-height:42px;font-size:.84rem;white-space:nowrap;
+  transition:background .2s ease,color .2s ease,border-color .2s ease;
+}
+.cms__tab:hover{border-color:var(--blush);color:var(--wine)}
+.cms__tab.is-active{background:var(--wine);border-color:var(--wine);color:#fff}
+
+.cms__layout{display:grid;gap:16px;align-items:start}
+
+.cms__sections{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.cms__section-btn{
+  flex:none;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);
+  border-radius:999px;padding:9px 16px;min-height:40px;font-size:.8rem;white-space:nowrap;
+  transition:background .2s ease,color .2s ease,border-color .2s ease;
+}
+.cms__section-btn:hover{border-color:var(--blush);color:var(--wine)}
+.cms__section-btn.is-active{background:var(--blush-tint);border-color:var(--blush);color:var(--wine)}
+
+.cms__editor{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:clamp(18px,2.4vw,26px);min-width:0;
+}
+.cms__editor-head{margin-bottom:20px}
+.cms__editor-head h2{font-size:1.25rem;color:var(--wine)}
+.cms__editor-head .card__sub{margin-top:4px;max-width:60ch}
+
+.cms__preview{min-width:0;display:grid;gap:8px}
+.cms__preview-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 16px;
+}
+.cms__preview-title{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.cms__preview-tools{margin-left:auto;display:flex;align-items:center;gap:6px}
+.cms__chip{
+  border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);
+  border-radius:999px;padding:7px 13px;min-height:36px;font-size:.74rem;
+}
+.cms__chip.is-active{background:var(--wine);border-color:var(--wine);color:#fff}
+.cms__frame{
+  position:relative;height:clamp(320px,52vh,560px);overflow:hidden;
+  border:1px solid var(--line);border-radius:14px;background:var(--canvas);
+}
+.cms__frame iframe{position:absolute;top:0;left:0;border:0;transform-origin:top left}
+.cms__preview-note{font-size:.76rem;color:var(--muted);line-height:1.45}
+.cms__preview.is-collapsed .cms__frame,
+.cms__preview.is-collapsed .cms__preview-note{display:none}
+.cms__preview.is-collapsed [data-cms-toggle] svg{transform:rotate(180deg)}
+
+@media(min-width:1040px){
+  .cms__layout{grid-template-columns:216px minmax(0,1fr)}
+  .cms__sections{
+    flex-direction:column;overflow:visible;gap:4px;
+    position:sticky;top:104px;padding-bottom:0;
+  }
+  .cms__section-btn{width:100%;text-align:left;border-radius:10px;padding:11px 14px}
+  .cms__preview{grid-column:1 / -1}
+}
+@media(min-width:1480px){
+  .cms__layout{grid-template-columns:216px minmax(0,1fr) minmax(380px,.85fr)}
+  .cms__preview{grid-column:auto;position:sticky;top:104px}
+  .cms__frame{height:clamp(420px,66vh,700px)}
+}
+@media(max-width:1479px){
+  /* keep the preview in sight while the fields scroll under it */
+  .cms__preview{order:-1;position:sticky;top:96px;z-index:6;background:var(--canvas);
+    padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .cms__frame{height:clamp(240px,34vh,340px)}
+}
+@media(max-width:900px){
+  /* on a phone a pinned preview would eat the screen — let it scroll away */
+  .cms__preview{position:static;border-bottom:0}
+}
+@media(max-width:900px){
+  .cms__chip{min-height:40px;padding:9px 15px}
+}
+@media(max-width:560px){
+  .cms__preview-title{display:none}
+  .cms__preview-tools{margin-left:0;width:100%;justify-content:space-between}
+  .cms__preview-bar{padding:8px}
+}

@@ -56,7 +56,7 @@ there — there is no need to touch code.
 | Orders | Every order with customer details, items and totals. Move an order through New → Confirmed → Packed → Delivered → Cancelled, add a private note, copy the address, call or WhatsApp the customer, export everything to CSV |
 | Products | Add, edit, duplicate, reorder, hide or delete gifts — name, price, “was” price, category, badge, descriptions, what’s-inside list, tags, pictures, featured on the home page |
 | Categories | Add, rename, reorder and re-picture the category tiles |
-| Text & pages | Every heading, paragraph, button label and list on every page — hero, ribbon, sunset band, story, promises, reviews, shop page, product page, cart, checkout, thank-you page, contact, FAQ and footer |
+| Text & pages | Pick a page along the top, a section down the side, and edit just that section — with a **live preview** beside it showing the real page, scrolled to the section and updating as you type. Covers every heading, paragraph, button label, picture and list on the site |
 | Appearance | The eight brand colours, three fonts and corner roundness, with a live preview |
 | Shop settings | Shop name, currency and its position, WhatsApp number and greeting, contact details, delivery fee, free-delivery threshold, country list, announcement bar, menu links |
 | Images | Upload photos (they are shrunk in the browser first) and pick them anywhere an image is used |
@@ -67,6 +67,13 @@ whether the customer's details ride along, and send yourself a test message.
 
 Changes are held until you press **Save changes** (or ⌘/Ctrl + S); **Discard** throws
 them away. Saving publishes to every visitor immediately.
+
+The preview in *Text & pages* is the shop itself in an iframe, fed your unsaved
+draft over `postMessage` — so what you see is the real layout, not a mock-up.
+Sections are found through `data-section-id` markers in the page markup; the
+preview scrolls to the marked section and outlines it. The Cart tab opens the
+drawer with a demo item, and the Checkout tab fills a demo basket, so those
+screens can be edited without shopping first. None of it touches your own cart.
 
 ## Setting it up on Vercel
 

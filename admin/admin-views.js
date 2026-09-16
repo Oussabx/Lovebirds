@@ -286,189 +286,351 @@
   }
 
   /* ------------------------------------------------------------- content */
-  const SECTIONS = [
-    { id: 'hero', title: 'Home · the top of the page', fields: [
-      { p: 'home.hero.eyebrow', l: 'Small line above the headline' },
-      { p: 'home.hero.title', l: 'Headline' },
-      { p: 'home.hero.titleScript', l: 'Headline — handwritten half' },
-      { p: 'home.hero.lede', l: 'Intro paragraph', t: 'area' },
-      { p: 'home.hero.ctaPrimary.label', l: 'Main button' },
-      { p: 'home.hero.ctaPrimary.href', l: 'Main button link' },
-      { p: 'home.hero.ctaSecondary.label', l: 'Second button' },
-      { p: 'home.hero.ctaSecondary.href', l: 'Second button link' },
-      { p: 'home.hero.image', l: 'Hero picture', t: 'image' },
-      { p: 'home.hero.imageAlt', l: 'Picture description (for screen readers)' },
-      { p: 'home.hero.chipScript', l: 'Floating note (handwritten)', t: 'area' },
-      { p: 'home.hero.chipText', l: 'Floating note (with gift icon)', t: 'area' },
-      { p: 'home.hero.stats', l: 'Three little facts', t: 'objects',
-        fields: [{ k: 'value', l: 'Big text' , add: 'Add a fact' }, { k: 'label', l: 'Caption' }] }
+  /* ------------------------------------------------------------- pages & sections
+     Every page of the shop, split into the sections you see on screen. Each one
+     carries the fields that control it and the marker used to scroll the live
+     preview to the right place. */
+  const PAGES = [
+    { id: 'home', label: 'Home', url: 'index.html', sections: [
+      { id: 'hero', label: 'Top of the page', target: 'home.hero',
+        hint: 'The first thing visitors see: the big headline, the picture and the two buttons.',
+        fields: [
+          { p: 'home.hero.eyebrow', l: 'Small line above the headline' },
+          { p: 'home.hero.title', l: 'Headline' },
+          { p: 'home.hero.titleScript', l: 'Headline — handwritten half' },
+          { p: 'home.hero.lede', l: 'Intro paragraph', t: 'area' },
+          { p: 'home.hero.ctaPrimary.label', l: 'Main button' },
+          { p: 'home.hero.ctaPrimary.href', l: 'Main button link' },
+          { p: 'home.hero.ctaSecondary.label', l: 'Second button' },
+          { p: 'home.hero.ctaSecondary.href', l: 'Second button link' },
+          { p: 'home.hero.image', l: 'Hero picture', t: 'image' },
+          { p: 'home.hero.imageAlt', l: 'Picture description (for screen readers)' },
+          { p: 'home.hero.chipScript', l: 'Floating note (handwritten)', t: 'area' },
+          { p: 'home.hero.chipText', l: 'Floating note (with gift icon)', t: 'area' },
+          { p: 'home.hero.stats', l: 'Three little facts', t: 'objects', add: 'Add a fact',
+            fields: [{ k: 'value', l: 'Big text' }, { k: 'label', l: 'Caption' }] }
+        ]},
+      { id: 'marquee', label: 'Scrolling ribbon', target: 'home.marquee',
+        hint: 'The burgundy strip of phrases that slides past under the hero.',
+        fields: [{ p: 'home.marquee', l: 'Phrases', t: 'strings' }] },
+      { id: 'categories', label: 'Category tiles', target: 'home.categories',
+        hint: 'The heading above the four tiles. The tiles themselves — names and pictures — live in the Categories tab.',
+        fields: [
+          { p: 'home.categoriesSection.eyebrow', l: 'Eyebrow' },
+          { p: 'home.categoriesSection.title', l: 'Title' },
+          { p: 'home.categoriesSection.lede', l: 'Text', t: 'area' }
+        ]},
+      { id: 'featured', label: 'Featured gifts', target: 'home.featured',
+        hint: 'The heading above the gift grid. Which gifts appear is set per product, with “Show on the home page”.',
+        fields: [
+          { p: 'home.featured.eyebrow', l: 'Eyebrow' },
+          { p: 'home.featured.title', l: 'Title' },
+          { p: 'home.featured.ctaLabel', l: 'Button under the grid' }
+        ]},
+      { id: 'band', label: 'Sunset band', target: 'home.band',
+        hint: 'The wide sunset panel with the birds on a wire.',
+        fields: [
+          { p: 'home.band.eyebrow', l: 'Eyebrow' },
+          { p: 'home.band.title', l: 'Title', t: 'area' },
+          { p: 'home.band.text', l: 'Text', t: 'area' },
+          { p: 'home.band.ctaLabel', l: 'Button' },
+          { p: 'home.band.ctaHref', l: 'Button link' }
+        ]},
+      { id: 'story', label: 'Story', target: 'home.story',
+        hint: 'Two pictures, a handwritten note and the list of reasons to buy from you.',
+        fields: [
+          { p: 'home.story.eyebrow', l: 'Eyebrow' },
+          { p: 'home.story.title', l: 'Title' },
+          { p: 'home.story.lede', l: 'Text', t: 'area' },
+          { p: 'home.story.note', l: 'Handwritten note', t: 'area' },
+          { p: 'home.story.images', l: 'Two pictures', t: 'gallery' },
+          { p: 'home.story.linkLabel', l: 'Link text' },
+          { p: 'home.story.linkHref', l: 'Link address' },
+          { p: 'home.story.points', l: 'Points', t: 'objects', add: 'Add a point',
+            fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'text', l: 'Text' }] }
+        ]},
+      { id: 'values', label: 'Promise cards', target: 'home.values',
+        hint: 'The four cards on the blush background.',
+        fields: [
+          { p: 'home.values.eyebrow', l: 'Eyebrow' },
+          { p: 'home.values.title', l: 'Title' },
+          { p: 'home.values.items', l: 'Cards', t: 'objects', add: 'Add a card',
+            fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'title', l: 'Title' }, { k: 'text', l: 'Text', t: 'area' }] }
+        ]},
+      { id: 'quotes', label: 'Reviews', target: 'home.quotes',
+        hint: 'What customers said.',
+        fields: [
+          { p: 'home.quotes.eyebrow', l: 'Eyebrow' },
+          { p: 'home.quotes.title', l: 'Title' },
+          { p: 'home.quotes.items', l: 'Reviews', t: 'objects', add: 'Add a review',
+            fields: [{ k: 'text', l: 'Review', t: 'area' }, { k: 'author', l: 'Who said it' }, { k: 'stars', l: 'Stars (1–5)', t: 'number' }] }
+        ]},
+      { id: 'cta', label: 'Closing invitation', target: 'home.cta',
+        hint: 'The last block before the footer.',
+        fields: [
+          { p: 'home.cta.eyebrow', l: 'Eyebrow' },
+          { p: 'home.cta.title', l: 'Title', t: 'area' },
+          { p: 'home.cta.text', l: 'Text', t: 'area' },
+          { p: 'home.cta.waLabel', l: 'WhatsApp button' },
+          { p: 'home.cta.secondaryLabel', l: 'Second button' },
+          { p: 'home.cta.secondaryHref', l: 'Second button link' }
+        ]}
     ]},
-    { id: 'marquee', title: 'Home · scrolling ribbon', fields: [
-      { p: 'home.marquee', l: 'Phrases', t: 'strings' }
+
+    { id: 'shop', label: 'Shop', url: 'categories.html', sections: [
+      { id: 'head', label: 'Page heading', target: 'shop.head',
+        hint: 'The title at the top of the gift list.',
+        fields: [
+          { p: 'shop.eyebrow', l: 'Eyebrow' },
+          { p: 'shop.title', l: 'Title' },
+          { p: 'shop.lede', l: 'Intro', t: 'area' }
+        ]},
+      { id: 'filters', label: 'Filters', target: 'shop.grid',
+        hint: 'The row of category chips above the gifts.',
+        fields: [
+          { p: 'shop.filterLabel', l: 'Label before the chips' },
+          { p: 'shop.allLabel', l: 'First chip (all gifts)' }
+        ]},
+      { id: 'cta', label: 'Bottom block', target: 'shop.cta',
+        hint: 'The help block under the gift grid.',
+        fields: [
+          { p: 'shop.cta.eyebrow', l: 'Eyebrow' },
+          { p: 'shop.cta.title', l: 'Title' },
+          { p: 'shop.cta.text', l: 'Text', t: 'area' },
+          { p: 'shop.cta.waLabel', l: 'WhatsApp button' },
+          { p: 'shop.cta.secondaryLabel', l: 'Second button' }
+        ]}
     ]},
-    { id: 'homeSections', title: 'Home · section headings', fields: [
-      { p: 'home.categoriesSection.eyebrow', l: 'Categories — eyebrow' },
-      { p: 'home.categoriesSection.title', l: 'Categories — title' },
-      { p: 'home.categoriesSection.lede', l: 'Categories — text', t: 'area' },
-      { p: 'home.featured.eyebrow', l: 'Featured — eyebrow' },
-      { p: 'home.featured.title', l: 'Featured — title' },
-      { p: 'home.featured.ctaLabel', l: 'Featured — button' }
+
+    { id: 'product', label: 'Product page', url: 'product.html', sections: [
+      { id: 'buttons', label: 'Buttons', target: 'product.main',
+        hint: 'What the buying buttons say on every product page.',
+        fields: [
+          { p: 'product.addLabel', l: 'Add to cart button' },
+          { p: 'product.whatsappLabel', l: 'WhatsApp button' },
+          { p: 'product.quantityLabel', l: 'Quantity label' }
+        ]},
+      { id: 'assurances', label: 'Reassurance lines', target: 'product.main',
+        hint: 'The short promises under the buttons.',
+        fields: [
+          { p: 'product.assurances', l: 'Lines', t: 'objects', add: 'Add a line',
+            fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'text', l: 'Text' }] }
+        ]},
+      { id: 'panels', label: 'Detail panels', target: 'product.main',
+        hint: 'The three fold-out panels. What they say per gift is edited on the product itself.',
+        fields: [
+          { p: 'product.tabDescription', l: 'First panel title' },
+          { p: 'product.tabIncludes', l: 'Second panel title' },
+          { p: 'product.tabDelivery', l: 'Third panel title' },
+          { p: 'product.deliveryText', l: 'Delivery & returns text', t: 'area' }
+        ]},
+      { id: 'related', label: 'You might also love', target: 'product.related',
+        hint: 'The heading above the suggestions.',
+        fields: [
+          { p: 'product.relatedEyebrow', l: 'Eyebrow' },
+          { p: 'product.relatedTitle', l: 'Title' }
+        ]}
     ]},
-    { id: 'band', title: 'Home · sunset band', fields: [
-      { p: 'home.band.eyebrow', l: 'Eyebrow' },
-      { p: 'home.band.title', l: 'Title', t: 'area' },
-      { p: 'home.band.text', l: 'Text', t: 'area' },
-      { p: 'home.band.ctaLabel', l: 'Button' },
-      { p: 'home.band.ctaHref', l: 'Button link' }
+
+    { id: 'cart', label: 'Cart', url: 'index.html', sections: [
+      { id: 'drawer', label: 'Cart drawer', preview: { openCart: true, demoCart: true, device: 'phone' },
+        hint: 'The panel that slides in when someone adds a gift.',
+        fields: [
+          { p: 'cart.title', l: 'Title' },
+          { p: 'cart.subtotalLabel', l: 'Subtotal label' },
+          { p: 'cart.note', l: 'Small note under the total' },
+          { p: 'cart.checkoutLabel', l: 'Checkout button' },
+          { p: 'cart.continueLabel', l: 'Keep shopping button' },
+          { p: 'cart.freeAway', l: 'Free delivery — still to go' },
+          { p: 'cart.freeDone', l: 'Free delivery — reached' },
+          { p: 'cart.addedToast', l: 'Message when a gift is added' },
+          { p: 'cart.whatsappSoon', l: 'Message when WhatsApp is not set up' }
+        ]},
+      { id: 'empty', label: 'Empty cart', preview: { openCart: true, cart: [], device: 'phone' },
+        hint: 'What the drawer says before anything is added.',
+        fields: [
+          { p: 'cart.emptyTitle', l: 'Title' },
+          { p: 'cart.emptyText', l: 'Text', t: 'area' },
+          { p: 'cart.browseLabel', l: 'Button' }
+        ]}
     ]},
-    { id: 'story', title: 'Home · story section', fields: [
-      { p: 'home.story.eyebrow', l: 'Eyebrow' },
-      { p: 'home.story.title', l: 'Title' },
-      { p: 'home.story.lede', l: 'Text', t: 'area' },
-      { p: 'home.story.note', l: 'Handwritten note', t: 'area' },
-      { p: 'home.story.images', l: 'Two pictures', t: 'strings' },
-      { p: 'home.story.linkLabel', l: 'Link text' },
-      { p: 'home.story.linkHref', l: 'Link address' },
-      { p: 'home.story.points', l: 'Points', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a point' }, { k: 'text', l: 'Text' }] }
+
+    { id: 'checkout', label: 'Checkout', url: 'checkout.html', sections: [
+      { id: 'copy', label: 'Headings & buttons', target: 'checkout.main', preview: { demoCart: true },
+        fields: [
+          { p: 'checkout.eyebrow', l: 'Eyebrow' },
+          { p: 'checkout.title', l: 'Title' },
+          { p: 'checkout.deliveryTitle', l: 'Delivery section title' },
+          { p: 'checkout.saveLabel', l: 'Save details checkbox' },
+          { p: 'checkout.summaryTitle', l: 'Order summary title' },
+          { p: 'checkout.completeLabel', l: 'Complete order button' },
+          { p: 'checkout.secureNote', l: 'Privacy note', t: 'area' }
+        ]},
+      { id: 'labels', label: 'Field labels', target: 'checkout.main', preview: { demoCart: true },
+        hint: 'What each box in the delivery form is called.',
+        fields: [
+          { p: 'checkout.labels.country', l: 'Country' },
+          { p: 'checkout.labels.firstName', l: 'First name' },
+          { p: 'checkout.labels.lastName', l: 'Last name' },
+          { p: 'checkout.labels.address', l: 'Address' },
+          { p: 'checkout.labels.apartment', l: 'Apartment / floor' },
+          { p: 'checkout.labels.city', l: 'City' },
+          { p: 'checkout.labels.phone', l: 'Phone' },
+          { p: 'checkout.labels.email', l: 'Email' },
+          { p: 'checkout.labels.note', l: 'Card note' }
+        ]},
+      { id: 'payment', label: 'Payment', target: 'checkout.main', preview: { demoCart: true },
+        hint: 'The cash-on-delivery box.',
+        fields: [
+          { p: 'checkout.paymentTitle', l: 'Section title' },
+          { p: 'checkout.paymentNote', l: 'Note beside the title' },
+          { p: 'checkout.codTitle', l: 'Cash on delivery — title' },
+          { p: 'checkout.codText', l: 'Cash on delivery — text', t: 'area' }
+        ]},
+      { id: 'empty', label: 'Empty cart message', target: 'checkout.main', preview: { cart: [] },
+        fields: [
+          { p: 'checkout.emptyTitle', l: 'Title' },
+          { p: 'checkout.emptyText', l: 'Text' }
+        ]}
     ]},
-    { id: 'values', title: 'Home · promise cards', fields: [
-      { p: 'home.values.eyebrow', l: 'Eyebrow' },
-      { p: 'home.values.title', l: 'Title' },
-      { p: 'home.values.items', l: 'Cards', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a card' }, { k: 'title', l: 'Title' }, { k: 'text', l: 'Text', t: 'area' }] }
+
+    { id: 'confirm', label: 'Thank you', url: 'order-confirmed.html', sections: [
+      { id: 'message', label: 'Thank-you message', target: 'confirm.main',
+        hint: 'The page a customer lands on after ordering.',
+        fields: [
+          { p: 'confirm.thanks', l: 'Greeting' },
+          { p: 'confirm.title', l: 'Title' },
+          { p: 'confirm.text', l: 'Text', t: 'area' },
+          { p: 'confirm.keepLabel', l: 'Keep browsing button' },
+          { p: 'confirm.askLabel', l: 'Ask about order button' }
+        ]}
     ]},
-    { id: 'quotes', title: 'Home · reviews', fields: [
-      { p: 'home.quotes.eyebrow', l: 'Eyebrow' },
-      { p: 'home.quotes.title', l: 'Title' },
-      { p: 'home.quotes.items', l: 'Reviews', t: 'objects',
-        fields: [{ k: 'text', l: 'Review', t: 'area' , add: 'Add a review' }, { k: 'author', l: 'Who said it' }, { k: 'stars', l: 'Stars (1–5)', t: 'number' }] }
+
+    { id: 'contact', label: 'Contact', url: 'contact.html', sections: [
+      { id: 'head', label: 'Page heading', target: 'contact.head',
+        fields: [
+          { p: 'contact.eyebrow', l: 'Eyebrow' },
+          { p: 'contact.title', l: 'Title' },
+          { p: 'contact.lede', l: 'Intro', t: 'area' }
+        ]},
+      { id: 'form', label: 'Message form', target: 'contact.main',
+        fields: [
+          { p: 'contact.formTitle', l: 'Form title' },
+          { p: 'contact.formLede', l: 'Form intro' },
+          { p: 'contact.sendLabel', l: 'Send button' },
+          { p: 'contact.sentMessage', l: 'Message after sending' }
+        ]},
+      { id: 'info', label: 'Contact blocks', target: 'contact.main',
+        hint: 'WhatsApp, email, hours, address, delivery.',
+        fields: [
+          { p: 'contact.info', l: 'Blocks', t: 'objects', add: 'Add a block',
+            fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'title', l: 'Title' },
+                     { k: 'text', l: 'Text', t: 'area' }, { k: 'link', l: 'Link (optional)' }] }
+        ]},
+      { id: 'faq', label: 'Questions & answers', target: 'contact.faq',
+        fields: [
+          { p: 'contact.faqEyebrow', l: 'Eyebrow' },
+          { p: 'contact.faqTitle', l: 'Title' },
+          { p: 'contact.faq', l: 'Questions', t: 'objects', add: 'Add a question',
+            fields: [{ k: 'q', l: 'Question' }, { k: 'a', l: 'Answer', t: 'area' }] }
+        ]}
     ]},
-    { id: 'homeCta', title: 'Home · closing invitation', fields: [
-      { p: 'home.cta.eyebrow', l: 'Eyebrow' },
-      { p: 'home.cta.title', l: 'Title', t: 'area' },
-      { p: 'home.cta.text', l: 'Text', t: 'area' },
-      { p: 'home.cta.waLabel', l: 'WhatsApp button' },
-      { p: 'home.cta.secondaryLabel', l: 'Second button' },
-      { p: 'home.cta.secondaryHref', l: 'Second button link' }
-    ]},
-    { id: 'shop', title: 'Shop page', fields: [
-      { p: 'shop.eyebrow', l: 'Eyebrow' },
-      { p: 'shop.title', l: 'Title' },
-      { p: 'shop.lede', l: 'Intro', t: 'area' },
-      { p: 'shop.filterLabel', l: 'Filter label' },
-      { p: 'shop.allLabel', l: '“All gifts” chip' },
-      { p: 'shop.cta.eyebrow', l: 'Bottom block — eyebrow' },
-      { p: 'shop.cta.title', l: 'Bottom block — title' },
-      { p: 'shop.cta.text', l: 'Bottom block — text', t: 'area' },
-      { p: 'shop.cta.waLabel', l: 'Bottom block — WhatsApp button' },
-      { p: 'shop.cta.secondaryLabel', l: 'Bottom block — second button' }
-    ]},
-    { id: 'product', title: 'Product page', fields: [
-      { p: 'product.addLabel', l: 'Add to cart button' },
-      { p: 'product.whatsappLabel', l: 'WhatsApp button' },
-      { p: 'product.quantityLabel', l: 'Quantity label' },
-      { p: 'product.assurances', l: 'Reassurance lines', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a line' }, { k: 'text', l: 'Text' }] },
-      { p: 'product.tabDescription', l: 'First panel title' },
-      { p: 'product.tabIncludes', l: 'Second panel title' },
-      { p: 'product.tabDelivery', l: 'Third panel title' },
-      { p: 'product.deliveryText', l: 'Delivery & returns text', t: 'area' },
-      { p: 'product.relatedEyebrow', l: 'Related — eyebrow' },
-      { p: 'product.relatedTitle', l: 'Related — title' }
-    ]},
-    { id: 'cart', title: 'Cart drawer', fields: [
-      { p: 'cart.title', l: 'Title' },
-      { p: 'cart.emptyTitle', l: 'Empty — title' },
-      { p: 'cart.emptyText', l: 'Empty — text', t: 'area' },
-      { p: 'cart.browseLabel', l: 'Empty — button' },
-      { p: 'cart.subtotalLabel', l: 'Subtotal label' },
-      { p: 'cart.note', l: 'Small note under the total' },
-      { p: 'cart.checkoutLabel', l: 'Checkout button' },
-      { p: 'cart.continueLabel', l: 'Keep shopping button' },
-      { p: 'cart.freeAway', l: 'Free delivery — still to go' },
-      { p: 'cart.freeDone', l: 'Free delivery — reached' },
-      { p: 'cart.addedToast', l: 'Added message' },
-      { p: 'cart.whatsappSoon', l: 'Message when WhatsApp is not set up' }
-    ]},
-    { id: 'checkout', title: 'Checkout page', fields: [
-      { p: 'checkout.eyebrow', l: 'Eyebrow' },
-      { p: 'checkout.title', l: 'Title' },
-      { p: 'checkout.deliveryTitle', l: 'Delivery section title' },
-      { p: 'checkout.paymentTitle', l: 'Payment section title' },
-      { p: 'checkout.paymentNote', l: 'Payment note' },
-      { p: 'checkout.codTitle', l: 'Cash on delivery — title' },
-      { p: 'checkout.codText', l: 'Cash on delivery — text', t: 'area' },
-      { p: 'checkout.saveLabel', l: 'Save details checkbox' },
-      { p: 'checkout.completeLabel', l: 'Complete order button' },
-      { p: 'checkout.summaryTitle', l: 'Summary title' },
-      { p: 'checkout.secureNote', l: 'Privacy note', t: 'area' },
-      { p: 'checkout.emptyTitle', l: 'Empty cart — title' },
-      { p: 'checkout.emptyText', l: 'Empty cart — text' }
-    ]},
-    { id: 'checkoutLabels', title: 'Checkout · field labels', fields: [
-      { p: 'checkout.labels.country', l: 'Country' },
-      { p: 'checkout.labels.firstName', l: 'First name' },
-      { p: 'checkout.labels.lastName', l: 'Last name' },
-      { p: 'checkout.labels.address', l: 'Address' },
-      { p: 'checkout.labels.apartment', l: 'Apartment / floor' },
-      { p: 'checkout.labels.city', l: 'City' },
-      { p: 'checkout.labels.phone', l: 'Phone' },
-      { p: 'checkout.labels.email', l: 'Email' },
-      { p: 'checkout.labels.note', l: 'Card note' }
-    ]},
-    { id: 'confirm', title: 'Thank-you page', fields: [
-      { p: 'confirm.thanks', l: 'Greeting' },
-      { p: 'confirm.title', l: 'Title' },
-      { p: 'confirm.text', l: 'Text', t: 'area' },
-      { p: 'confirm.keepLabel', l: 'Keep browsing button' },
-      { p: 'confirm.askLabel', l: 'Ask about order button' }
-    ]},
-    { id: 'contact', title: 'Contact page', fields: [
-      { p: 'contact.eyebrow', l: 'Eyebrow' },
-      { p: 'contact.title', l: 'Title' },
-      { p: 'contact.lede', l: 'Intro', t: 'area' },
-      { p: 'contact.formTitle', l: 'Form title' },
-      { p: 'contact.formLede', l: 'Form intro' },
-      { p: 'contact.sendLabel', l: 'Send button' },
-      { p: 'contact.sentMessage', l: 'Message after sending' },
-      { p: 'contact.info', l: 'Contact blocks', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a block' }, { k: 'title', l: 'Title' },
-                 { k: 'text', l: 'Text', t: 'area' }, { k: 'link', l: 'Link (optional)' }] }
-    ]},
-    { id: 'faq', title: 'Questions & answers', fields: [
-      { p: 'contact.faqEyebrow', l: 'Eyebrow' },
-      { p: 'contact.faqTitle', l: 'Title' },
-      { p: 'contact.faq', l: 'Questions', t: 'objects',
-        fields: [{ k: 'q', l: 'Question' , add: 'Add a question' }, { k: 'a', l: 'Answer', t: 'area' }] }
-    ]},
-    { id: 'footer', title: 'Footer', fields: [
-      { p: 'footer.about', l: 'About line', t: 'area' },
-      { p: 'footer.contactTitle', l: 'Contact column title' },
-      { p: 'footer.bottomNote', l: 'Bottom line' },
-      { p: 'footer.columns', l: 'Link columns', t: 'objects',
-        fields: [{ k: 'title', l: 'Column title' }] }
+
+    { id: 'footer', label: 'Footer', url: 'index.html', sections: [
+      { id: 'about', label: 'Footer text', target: 'site.footer',
+        hint: 'Shown at the bottom of every page.',
+        fields: [
+          { p: 'footer.about', l: 'About line', t: 'area' },
+          { p: 'footer.contactTitle', l: 'Contact column title' },
+          { p: 'footer.bottomNote', l: 'Bottom line' }
+        ]},
+      { id: 'links', label: 'Link columns', target: 'site.footer', kind: 'footer-links',
+        hint: 'The two columns of links.',
+        fields: [
+          { p: 'footer.columns', l: 'Columns', t: 'objects', add: 'Add a column',
+            fields: [{ k: 'title', l: 'Column title' }] }
+        ]}
     ]}
   ];
 
+  function cmsState() {
+    if (!state.cms) state.cms = { page: 'home', section: 'hero', device: 'desktop', preview: true };
+    return state.cms;
+  }
+  const cmsPage = () => PAGES.find(p => p.id === cmsState().page) || PAGES[0];
+  const cmsSection = () => {
+    const page = cmsPage();
+    return page.sections.find(s => s.id === cmsState().section) || page.sections[0];
+  };
+
+  function previewUrl() {
+    const page = cmsPage();
+    if (page.id !== 'product') return '/' + page.url;
+    const first = (state.content.products || []).find(p => p.active !== false) || (state.content.products || [])[0];
+    return '/product.html?id=' + encodeURIComponent(first ? first.id : '');
+  }
+
+  /* ------------------------------------------------------------- content view */
   function viewContent() {
-    return SECTIONS.map(section => {
-      const open = state.openSections[section.id];
-      const body = open ? section.fields.map(renderField).join('') +
-        (section.id === 'footer' ? footerLinksEditor() : '') : '';
-      return [
-        '<div class="card">',
-        '<div class="card__head" style="margin-bottom:' + (open ? '18px' : '0') + '">',
-        '<h2>' + esc(section.title) + '</h2>',
-        '<button class="btn btn--ghost btn--sm" data-section="' + section.id + '">' + (open ? 'Close' : 'Edit') + '</button>',
-        '</div>', body, '</div>'
-      ].join('');
-    }).join('');
+    const cms = cmsState();
+    return [
+      '<div class="cms">',
+      '<div class="cms__tabs" role="tablist" aria-label="Pages">',
+      PAGES.map(page =>
+        '<button class="cms__tab' + (page.id === cms.page ? ' is-active' : '') + '" role="tab"' +
+        ' aria-selected="' + (page.id === cms.page ? 'true' : 'false') + '" data-cms-page="' + page.id + '">' +
+        esc(page.label) + '</button>').join(''),
+      '</div>',
+      '<div class="cms__layout">',
+      '<nav class="cms__sections" aria-label="Sections" data-cms-sections>' + cmsSectionList() + '</nav>',
+      '<div class="cms__editor" data-cms-editor>' + cmsEditor() + '</div>',
+      cmsPreview(cms),
+      '</div></div>'
+    ].join('');
+  }
+
+  function cmsSectionList() {
+    const cms = cmsState();
+    return cmsPage().sections.map(section =>
+      '<button class="cms__section-btn' + (section.id === cms.section ? ' is-active' : '') + '"' +
+      ' data-cms-section="' + section.id + '">' + esc(section.label) + '</button>').join('');
+  }
+
+  function cmsEditor() {
+    const section = cmsSection();
+    return [
+      '<div class="cms__editor-head">',
+      '<h2>' + esc(section.label) + '</h2>',
+      section.hint ? '<p class="card__sub">' + esc(section.hint) + '</p>' : '',
+      '</div>',
+      section.fields.map(renderField).join(''),
+      section.kind === 'footer-links' ? footerLinksEditor() : ''
+    ].join('');
+  }
+
+  function cmsPreview(cms) {
+    return [
+      '<aside class="cms__preview' + (cms.preview ? '' : ' is-collapsed') + '" data-cms-preview>',
+      '<div class="cms__preview-bar">',
+      '<span class="cms__preview-title">Live preview</span>',
+      '<div class="cms__preview-tools">',
+      '<button class="cms__chip' + (cms.device === 'phone' ? ' is-active' : '') + '" data-cms-device="phone">Phone</button>',
+      '<button class="cms__chip' + (cms.device === 'desktop' ? ' is-active' : '') + '" data-cms-device="desktop">Desktop</button>',
+      '<button class="iconbtn" data-cms-reload aria-label="Reload the preview" title="Reload">' + ICON.refresh + '</button>',
+      '<button class="iconbtn" data-cms-toggle aria-label="Hide or show the preview" title="Hide or show">' + ICON.chevron + '</button>',
+      '</div></div>',
+      '<div class="cms__frame" data-cms-frame>',
+      '<iframe title="Preview of your shop" src="' + esc(previewUrl()) + '" loading="lazy"></iframe>',
+      '</div>',
+      '<p class="cms__preview-note">Unsaved edits show here first. Press <strong>Save changes</strong> to put them on the live shop.</p>',
+      '</aside>'
+    ].join('');
   }
 
   function renderField(field) {
     if (field.t === 'area') return fArea(field.p, field.l, { rows: 3 });
     if (field.t === 'image') return fImage(field.p, field.l);
+    if (field.t === 'gallery') return fPictureList(field.p, field.l);
     if (field.t === 'strings') return fStrings(field.p, field.l);
     if (field.t === 'number') return fNum(field.p, field.l);
     if (field.t === 'objects') return fObjects(field.p, field.l, field.fields, { addLabel: field.add });
@@ -478,8 +640,110 @@
   function footerLinksEditor() {
     return (state.content.footer.columns || []).map((column, ci) =>
       '<div class="subform"><div class="subform__head"><strong>' + esc(column.title || 'Column') + ' links</strong></div>' +
-      fObjects('footer.columns.' + ci + '.links', 'Link', [{ k: 'label', l: 'Text' , add: 'Add a column' }, { k: 'href', l: 'Address' }]) +
+      fObjects('footer.columns.' + ci + '.links', 'Link', [{ k: 'label', l: 'Text' }, { k: 'href', l: 'Address' }], { addLabel: 'Add a link' }) +
       '</div>').join('');
+  }
+
+  /* A list of pictures, shown as pictures. */
+  function fPictureList(path, label) {
+    const list = (get(path) || []).filter(Boolean);
+    const tiles = list.map((src, i) => [
+      '<div class="media" style="width:96px">',
+      '<img src="' + esc(previewSrc(src)) + '" alt="" style="aspect-ratio:1">',
+      '<div class="media__bar" style="justify-content:center">',
+      '<button class="iconbtn" data-gallery-swap="' + path + '" data-index="' + i + '" aria-label="Replace picture ' + (i + 1) + '" title="Replace">' + ICON.edit + '</button>',
+      '<button class="iconbtn iconbtn--danger" data-gallery-remove="' + path + '" data-index="' + i + '" aria-label="Remove picture ' + (i + 1) + '" title="Remove">' + ICON.trash + '</button>',
+      '</div></div>'
+    ].join('')).join('');
+    return '<div class="field"><span class="field__label">' + esc(label) + '</span>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">' + tiles +
+      '<button class="btn btn--ghost btn--tiny" data-list-add-picture="' + path + '" style="height:96px;width:96px;flex-direction:column;gap:4px">' +
+      ICON.plus + '<span>Add</span></button></div></div>';
+  }
+
+  /* ------------------------------------------------------------- preview wiring */
+  let previewTimer = null;
+  let previewBound = false;
+
+  function pushPreview() {
+    const frame = $('[data-cms-frame] iframe');
+    if (!frame || !frame.contentWindow) return;
+    const section = cmsSection();
+    const preview = section.preview || {};
+    let cart = null;
+    if (preview.cart !== undefined) cart = preview.cart;
+    else if (preview.demoCart) {
+      const first = (state.content.products || []).find(p => p.active !== false);
+      cart = first ? [{ id: first.id, qty: 1 }] : [];
+    }
+    try {
+      frame.contentWindow.postMessage({
+        type: 'lb:preview',
+        content: state.content,
+        focus: section.target || null,
+        cart: cart,
+        openCart: Boolean(preview.openCart),
+        closeCart: !preview.openCart
+      }, location.origin);
+    } catch (e) {}
+  }
+
+  function queuePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(pushPreview, 250);
+  }
+
+  function applyPreferredDevice() {
+    const wanted = (cmsSection().preview || {}).device;
+    if (!wanted) return;
+    cmsState().device = wanted;
+    $$('[data-cms-device]').forEach(btn => btn.classList.toggle('is-active', btn.dataset.cmsDevice === wanted));
+    fitPreview();
+  }
+
+  function fitPreview() {
+    const shell = $('[data-cms-frame]');
+    const frame = shell && shell.querySelector('iframe');
+    if (!shell || !frame) return;
+    const width = cmsState().device === 'phone' ? 390 : 1280;
+    const scale = Math.min(1, shell.clientWidth / width);
+    frame.style.width = width + 'px';
+    frame.style.height = Math.ceil(shell.clientHeight / scale) + 'px';
+    frame.style.transform = 'scale(' + scale + ')';
+  }
+
+  function bindCms() {
+    const frame = $('[data-cms-frame] iframe');
+    if (frame) {
+      frame.addEventListener('load', () => { fitPreview(); pushPreview(); });
+      applyPreferredDevice();
+      fitPreview();
+      pushPreview();
+    }
+    if (!previewBound) {
+      previewBound = true;
+      window.addEventListener('message', (event) => {
+        if (event.origin !== location.origin) return;
+        if (event.data && event.data.type === 'lb:preview-ready') pushPreview();
+      });
+      window.addEventListener('resize', () => { if (state.view === 'content') fitPreview(); }, { passive: true });
+    }
+  }
+
+  /* Refresh only the editor side, so the preview iframe keeps its place. */
+  function refreshCms() {
+    const sections = $('[data-cms-sections]');
+    const editor = $('[data-cms-editor]');
+    if (!sections || !editor) return false;
+    sections.innerHTML = cmsSectionList();
+    editor.innerHTML = cmsEditor();
+    $$('[data-cms-page]').forEach(tab => {
+      const on = tab.dataset.cmsPage === cmsState().page;
+      tab.classList.toggle('is-active', on);
+      tab.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    pushPreview();
+    return true;
   }
 
   /* ------------------------------------------------------------- appearance */
@@ -764,6 +1028,7 @@
         if (swatch && /^#[0-9a-f]{6}$/i.test(value)) swatch.value = value;
       }
       markDirty();
+      queuePreview();
       return;
     }
     const colour = e.target.closest('[data-colour]');
@@ -772,6 +1037,7 @@
       const text = document.querySelector('[data-colour-text="' + colour.dataset.colour + '"]');
       if (text) text.value = colour.value;
       markDirty();
+      queuePreview();
       return;
     }
     const search = e.target.closest('[data-product-search]');
@@ -840,10 +1106,51 @@
       });
     }
 
-    const section = hit('[data-section]');
-    if (section) {
-      state.openSections[section.dataset.section] = !state.openSections[section.dataset.section];
-      return render();
+    /* text & pages: page tabs, section list, preview controls */
+    const pageTab = hit('[data-cms-page]');
+    if (pageTab) {
+      const cms = cmsState();
+      const before = previewUrl();
+      cms.page = pageTab.dataset.cmsPage;
+      cms.section = cmsPage().sections[0].id;
+      applyPreferredDevice();
+      refreshCms();
+      const after = previewUrl();
+      const frame = $('[data-cms-frame] iframe');
+      if (frame && after !== before) frame.src = after;
+      return;
+    }
+    const sectionBtn = hit('[data-cms-section]');
+    if (sectionBtn) {
+      cmsState().section = sectionBtn.dataset.cmsSection;
+      applyPreferredDevice();
+      return refreshCms();
+    }
+    const device = hit('[data-cms-device]');
+    if (device) {
+      cmsState().device = device.dataset.cmsDevice;
+      $$('[data-cms-device]').forEach(btn => btn.classList.toggle('is-active', btn === device));
+      return fitPreview();
+    }
+    if (hit('[data-cms-reload]')) {
+      const frame = $('[data-cms-frame] iframe');
+      if (frame) frame.src = frame.src;
+      return;
+    }
+    if (hit('[data-cms-toggle]')) {
+      const cms = cmsState();
+      cms.preview = !cms.preview;
+      const panel = $('[data-cms-preview]');
+      if (panel) panel.classList.toggle('is-collapsed', !cms.preview);
+      return setTimeout(fitPreview, 320);
+    }
+    const addPicture = hit('[data-list-add-picture]');
+    if (addPicture) {
+      const path = addPicture.dataset.listAddPicture;
+      const list = get(path) || [];
+      list.push('');
+      setPath(state.content, path, list);
+      return openPicker(path + '.' + (list.length - 1));
     }
 
     const orderBtn = hit('[data-order]');
@@ -1083,9 +1390,11 @@
   A.views = Object.assign(A.views, {
     products: viewProducts, categories: viewCategories, content: viewContent,
     appearance: viewAppearance, settings: viewSettings, media: viewMedia, account: viewAccount,
+    refreshCms: refreshCms,
     afterRender: (view) => {
       if (view === 'media') bindMedia();
       if (view === 'settings') bindNotify();
+      if (view === 'content') bindCms();
     }
   });
 
