@@ -169,7 +169,8 @@
     return '<div class="field"><span class="field__label">' + esc(label) + '</span>' +
       (rows || '<p class="field__hint" style="margin-bottom:10px">Nothing here yet.</p>') +
       '<button class="btn btn--ghost btn--sm" data-add-item="' + path + '" data-template="' +
-      esc(JSON.stringify(opts.template || fields.reduce((o, f) => (o[f.k] = '', o), {}))) + '">' + ICON.plus + ' Add ' + esc(label.toLowerCase()) + '</button></div>';
+      esc(JSON.stringify(opts.template || fields.reduce((o, f) => (o[f.k] = '', o), {}))) + '">' + ICON.plus + ' ' +
+      esc(opts.addLabel || ('Add ' + label.toLowerCase())) + '</button></div>';
   }
 
   function fGallery(path, productIndex) {
@@ -300,7 +301,7 @@
       { p: 'home.hero.chipScript', l: 'Floating note (handwritten)', t: 'area' },
       { p: 'home.hero.chipText', l: 'Floating note (with gift icon)', t: 'area' },
       { p: 'home.hero.stats', l: 'Three little facts', t: 'objects',
-        fields: [{ k: 'value', l: 'Big text' }, { k: 'label', l: 'Caption' }] }
+        fields: [{ k: 'value', l: 'Big text' , add: 'Add a fact' }, { k: 'label', l: 'Caption' }] }
     ]},
     { id: 'marquee', title: 'Home · scrolling ribbon', fields: [
       { p: 'home.marquee', l: 'Phrases', t: 'strings' }
@@ -329,19 +330,19 @@
       { p: 'home.story.linkLabel', l: 'Link text' },
       { p: 'home.story.linkHref', l: 'Link address' },
       { p: 'home.story.points', l: 'Points', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'text', l: 'Text' }] }
+        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a point' }, { k: 'text', l: 'Text' }] }
     ]},
     { id: 'values', title: 'Home · promise cards', fields: [
       { p: 'home.values.eyebrow', l: 'Eyebrow' },
       { p: 'home.values.title', l: 'Title' },
       { p: 'home.values.items', l: 'Cards', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'title', l: 'Title' }, { k: 'text', l: 'Text', t: 'area' }] }
+        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a card' }, { k: 'title', l: 'Title' }, { k: 'text', l: 'Text', t: 'area' }] }
     ]},
     { id: 'quotes', title: 'Home · reviews', fields: [
       { p: 'home.quotes.eyebrow', l: 'Eyebrow' },
       { p: 'home.quotes.title', l: 'Title' },
       { p: 'home.quotes.items', l: 'Reviews', t: 'objects',
-        fields: [{ k: 'text', l: 'Review', t: 'area' }, { k: 'author', l: 'Who said it' }, { k: 'stars', l: 'Stars (1–5)', t: 'number' }] }
+        fields: [{ k: 'text', l: 'Review', t: 'area' , add: 'Add a review' }, { k: 'author', l: 'Who said it' }, { k: 'stars', l: 'Stars (1–5)', t: 'number' }] }
     ]},
     { id: 'homeCta', title: 'Home · closing invitation', fields: [
       { p: 'home.cta.eyebrow', l: 'Eyebrow' },
@@ -368,7 +369,7 @@
       { p: 'product.whatsappLabel', l: 'WhatsApp button' },
       { p: 'product.quantityLabel', l: 'Quantity label' },
       { p: 'product.assurances', l: 'Reassurance lines', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'text', l: 'Text' }] },
+        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a line' }, { k: 'text', l: 'Text' }] },
       { p: 'product.tabDescription', l: 'First panel title' },
       { p: 'product.tabIncludes', l: 'Second panel title' },
       { p: 'product.tabDelivery', l: 'Third panel title' },
@@ -432,14 +433,14 @@
       { p: 'contact.sendLabel', l: 'Send button' },
       { p: 'contact.sentMessage', l: 'Message after sending' },
       { p: 'contact.info', l: 'Contact blocks', t: 'objects',
-        fields: [{ k: 'icon', l: 'Icon', t: 'icon' }, { k: 'title', l: 'Title' },
+        fields: [{ k: 'icon', l: 'Icon', t: 'icon' , add: 'Add a block' }, { k: 'title', l: 'Title' },
                  { k: 'text', l: 'Text', t: 'area' }, { k: 'link', l: 'Link (optional)' }] }
     ]},
     { id: 'faq', title: 'Questions & answers', fields: [
       { p: 'contact.faqEyebrow', l: 'Eyebrow' },
       { p: 'contact.faqTitle', l: 'Title' },
       { p: 'contact.faq', l: 'Questions', t: 'objects',
-        fields: [{ k: 'q', l: 'Question' }, { k: 'a', l: 'Answer', t: 'area' }] }
+        fields: [{ k: 'q', l: 'Question' , add: 'Add a question' }, { k: 'a', l: 'Answer', t: 'area' }] }
     ]},
     { id: 'footer', title: 'Footer', fields: [
       { p: 'footer.about', l: 'About line', t: 'area' },
@@ -470,14 +471,14 @@
     if (field.t === 'image') return fImage(field.p, field.l);
     if (field.t === 'strings') return fStrings(field.p, field.l);
     if (field.t === 'number') return fNum(field.p, field.l);
-    if (field.t === 'objects') return fObjects(field.p, field.l, field.fields);
+    if (field.t === 'objects') return fObjects(field.p, field.l, field.fields, { addLabel: field.add });
     return fText(field.p, field.l);
   }
 
   function footerLinksEditor() {
     return (state.content.footer.columns || []).map((column, ci) =>
       '<div class="subform"><div class="subform__head"><strong>' + esc(column.title || 'Column') + ' links</strong></div>' +
-      fObjects('footer.columns.' + ci + '.links', 'Link', [{ k: 'label', l: 'Text' }, { k: 'href', l: 'Address' }]) +
+      fObjects('footer.columns.' + ci + '.links', 'Link', [{ k: 'label', l: 'Text' , add: 'Add a column' }, { k: 'href', l: 'Address' }]) +
       '</div>').join('');
   }
 
@@ -556,7 +557,7 @@
 
       card('Menu',
         '<p class="field__hint" style="margin-bottom:14px">The three links in the navigation bar.</p>' +
-        fObjects('nav', 'Menu link', [{ k: 'label', l: 'Text' }, { k: 'href', l: 'Address' }]))
+        fObjects('nav', 'Menu link', [{ k: 'label', l: 'Text' }, { k: 'href', l: 'Address' }], { addLabel: 'Add a menu link' }))
     ].join('');
   }
 
