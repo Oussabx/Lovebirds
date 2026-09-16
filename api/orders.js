@@ -94,7 +94,12 @@ module.exports = L.handle(async (req, res) => {
       await L.setJSON('lb:order:' + order.id, order);
     }
 
-    return L.ok(res, { order: order });
+    /* Whether the shop's WhatsApp alert went through — and whatever the
+       provider said if it did not — is for the dashboard, not the customer. */
+    const receipt = Object.assign({}, order);
+    delete receipt.notified;
+    delete receipt.adminNote;
+    return L.ok(res, { order: receipt });
   }
 
   /* ------------------------------------------------------------- list */

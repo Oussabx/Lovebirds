@@ -76,17 +76,7 @@
 <script src="/assets/js/defaults.js"></script>
 <script src="/admin/admin.js"></script>
 <script src="/admin/admin-views.js"></script>
-<script>
-  /* If the dashboard scripts fail to load, say so instead of showing nothing. */
-  window.addEventListener('load', function () {
-    if (window.__LBADMIN) return;
-    var error = document.querySelector('[data-login-error]');
-    if (!error) return;
-    error.innerHTML = 'The dashboard files did not load. Try a hard refresh (Ctrl/Cmd + Shift + R); ' +
-      'if it keeps happening the deployment may be mid-build.';
-    error.hidden = false;
-  });
-</script>
+<script src="/admin/boot-check.js"></script>
 
 </body>
 </html>

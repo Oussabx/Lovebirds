@@ -1,6 +1,6 @@
 /* Product detail page */
 (function () {
-  const { $, $$, ICONS, money, productCard, observe } = window.LB;
+  const { $, $$, ICONS, money, productCard, observe, esc, safeUrl } = window.LB;
 
   const root = $('[data-pdp]');
   if (!root) return;
@@ -12,7 +12,7 @@
   function accItem(title, html, open) {
     return [
       '<div class="acc__item">',
-      '<button class="acc__btn" aria-expanded="' + (open ? 'true' : 'false') + '">' + title + ICONS.plus + '</button>',
+      '<button class="acc__btn" aria-expanded="' + (open ? 'true' : 'false') + '">' + esc(title) + ICONS.plus + '</button>',
       '<div class="acc__panel"' + (open ? '' : ' style="height:0"') + '><div class="acc__panel-inner">' + html + '</div></div>',
       '</div>'
     ].join('');
@@ -46,29 +46,29 @@
       '<div class="wrap">',
       '<nav class="breadcrumb" aria-label="Breadcrumb">',
       '<a href="index.html">Home</a>' + crumb,
-      '<a href="categories.html?cat=' + p.category + '">' + categoryName(p.category) + '</a>' + crumb,
-      '<span>' + p.name + '</span>',
+      '<a href="categories.html?cat=' + encodeURIComponent(p.category) + '">' + esc(categoryName(p.category)) + '</a>' + crumb,
+      '<span>' + esc(p.name) + '</span>',
       '</nav>',
       '<div class="pdp__grid">',
 
       '<div class="gallery" data-reveal="scale">',
-      '<div class="gallery__main"><img src="' + p.images[0] + '" alt="' + p.name + '" data-main width="640" height="640"></div>',
+      '<div class="gallery__main"><img src="' + esc(safeUrl(p.images[0])) + '" alt="' + esc(p.name) + '" data-main width="640" height="640"></div>',
       '<div class="gallery__thumbs">' + p.images.map((src, i) =>
-        '<button class="' + (i === 0 ? 'is-active' : '') + '" data-thumb="' + src + '" aria-label="View image ' + (i + 1) + '"><img src="' + src + '" alt="" width="160" height="160"></button>'
+        '<button class="' + (i === 0 ? 'is-active' : '') + '" data-thumb="' + esc(safeUrl(src)) + '" aria-label="View image ' + (i + 1) + '"><img src="' + esc(safeUrl(src)) + '" alt="" width="160" height="160"></button>'
       ).join('') + '</div>',
       '</div>',
 
       '<div class="pdp__info" data-reveal="right">',
-      '<span class="pdp__cat">' + categoryName(p.category) + '</span>',
-      '<h1>' + p.name + '</h1>',
-      p.script ? '<p class="pdp__script">' + p.script + '</p>' : '',
+      '<span class="pdp__cat">' + esc(categoryName(p.category)) + '</span>',
+      '<h1>' + esc(p.name) + '</h1>',
+      p.script ? '<p class="pdp__script">' + esc(p.script) + '</p>' : '',
       '<div class="pdp__price"><span class="now">' + money(p.price) + '</span>' +
         (p.compareAt ? '<span class="was">' + money(p.compareAt) + '</span><span class="save">Save ' + save + '%</span>' : '') +
       '</div>',
-      '<p class="pdp__desc">' + (p.description || p.short || '') + '</p>',
+      '<p class="pdp__desc">' + esc(p.description || p.short || '') + '</p>',
 
       '<div class="pdp__qty">',
-      '<span class="label">' + (labels.quantityLabel || 'Quantity') + '</span>',
+      '<span class="label">' + esc(labels.quantityLabel || 'Quantity') + '</span>',
       '<div class="qty qty--lg">',
       '<button data-q="-1" aria-label="Decrease quantity">' + ICONS.minus + '</button>',
       '<span data-qty>1</span>',
@@ -76,19 +76,19 @@
       '</div></div>',
 
       '<div class="pdp__actions">',
-      '<button class="btn btn--lg btn--block" data-add="' + p.id + '" data-qty="1">' + ICONS.bag + ' ' + (labels.addLabel || 'Add to cart') + '</button>',
-      '<button class="btn btn--wa btn--lg btn--block" data-wa data-wa-text="Hi ' + (CONFIG.brand || 'lovebirds') + '! I would like to order the ' + p.name + '.">' + ICONS.chat + ' ' + (labels.whatsappLabel || 'Buy on WhatsApp') + '</button>',
+      '<button class="btn btn--lg btn--block" data-add="' + esc(p.id) + '" data-qty="1">' + ICONS.bag + ' ' + esc(labels.addLabel || 'Add to cart') + '</button>',
+      '<button class="btn btn--wa btn--lg btn--block" data-wa data-wa-text="Hi ' + esc(CONFIG.brand || 'lovebirds') + '! I would like to order the ' + esc(p.name) + '.">' + ICONS.chat + ' ' + esc(labels.whatsappLabel || 'Buy on WhatsApp') + '</button>',
       '</div>',
 
       '<ul class="pdp__assure">',
       (labels.assurances || []).filter(a => a && String(a.text || '').trim())
-        .map(a => '<li>' + icon(a.icon) + ' ' + a.text + '</li>').join(''),
+        .map(a => '<li>' + icon(a.icon) + ' ' + esc(a.text) + '</li>').join(''),
       '</ul>',
 
       '<div class="acc">',
-      accItem(labels.tabDescription || 'Description', '<p>' + (p.description || '') + '</p>', true),
-      p.includes.filter(Boolean).length ? accItem(labels.tabIncludes || 'What’s inside', '<ul>' + p.includes.filter(Boolean).map(i => '<li>' + i + '</li>').join('') + '</ul>', false) : '',
-      accItem(labels.tabDelivery || 'Delivery & returns', '<p>' + (labels.deliveryText || '') + '</p>', false),
+      accItem(labels.tabDescription || 'Description', '<p>' + esc(p.description || '') + '</p>', true),
+      p.includes.filter(Boolean).length ? accItem(labels.tabIncludes || 'What’s inside', '<ul>' + p.includes.filter(Boolean).map(i => '<li>' + esc(i) + '</li>').join('') + '</ul>', false) : '',
+      accItem(labels.tabDelivery || 'Delivery & returns', '<p>' + esc(labels.deliveryText || '') + '</p>', false),
       '</div>',
 
       '</div></div></div>'

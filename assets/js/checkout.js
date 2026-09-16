@@ -1,6 +1,6 @@
 /* Checkout — delivery details, cash on delivery, order placement */
 (function () {
-  const { $, $$, ICONS, money, Cart, toast } = window.LB;
+  const { $, $$, ICONS, money, Cart, toast, esc, safeUrl } = window.LB;
 
   const form = $('[data-checkout]');
   if (!form) return;
@@ -19,7 +19,7 @@
     const chosen = country.value;
     const list = (CONFIG.countries || []).slice();
     country.innerHTML = '<option value="" disabled' + (chosen ? '' : ' selected') + '>Select a country</option>' +
-      list.map(c => '<option value="' + c + '"' + (c === chosen ? ' selected' : '') + '>' + c + '</option>').join('');
+      list.map(c => '<option value="' + esc(c) + '"' + (c === chosen ? ' selected' : '') + '>' + esc(c) + '</option>').join('');
   }
 
   function fillLabels() {
@@ -62,8 +62,8 @@
     if (itemsBox) {
       itemsBox.innerHTML = lines.map(l => [
         '<div class="summary__item">',
-        '<div class="summary__thumb"><img src="' + l.product.images[0] + '" alt="' + l.product.name + '" width="120" height="120"><span class="summary__qty">' + l.qty + '</span></div>',
-        '<div><div class="summary__name">' + l.product.name + '</div><div class="summary__meta">' + categoryName(l.product.category) + '</div></div>',
+        '<div class="summary__thumb"><img src="' + esc(safeUrl(l.product.images[0])) + '" alt="' + esc(l.product.name) + '" width="120" height="120"><span class="summary__qty">' + esc(l.qty) + '</span></div>',
+        '<div><div class="summary__name">' + esc(l.product.name) + '</div><div class="summary__meta">' + esc(categoryName(l.product.category)) + '</div></div>',
         '<div class="summary__price">' + money(l.total) + '</div>',
         '</div>'
       ].join('')).join('');
@@ -86,7 +86,7 @@
     }
     const cta = $('[data-complete]');
     if (cta && !cta.dataset.busy) {
-      cta.innerHTML = ((COPY.checkout && COPY.checkout.completeLabel) || 'Complete order') + ' · ' + money(tot);
+      cta.innerHTML = esc((COPY.checkout && COPY.checkout.completeLabel) || 'Complete order') + ' · ' + money(tot);
     }
   }
 

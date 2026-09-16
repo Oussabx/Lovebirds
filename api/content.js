@@ -37,6 +37,14 @@ module.exports = L.handle(async (req, res) => {
     if (!Array.isArray(content.products) || !Array.isArray(content.categories)) {
       return L.fail(res, 400, 'Content must include products and categories');
     }
+    if (!content.settings || typeof content.settings !== 'object' || Array.isArray(content.settings) ||
+        !content.theme || typeof content.theme !== 'object' || Array.isArray(content.theme)) {
+      return L.fail(res, 400, 'Content must include a settings object and a theme object');
+    }
+    const unsafe = L.findUnsafeKey(content, 0);
+    if (unsafe) {
+      return L.fail(res, 400, 'Content contains a reserved key ("' + unsafe + '") that is not allowed.');
+    }
     const serialised = JSON.stringify(content);
     if (serialised.length > MAX_BYTES) {
       return L.fail(res, 413, 'Content is too large (' + Math.round(serialised.length / 1024) + ' KB). Upload big images through the Media tab instead of pasting them in.');

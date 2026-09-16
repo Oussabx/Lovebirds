@@ -23,12 +23,16 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
     return value && typeof value === 'object' && !Array.isArray(value);
   }
 
+  var UNSAFE_KEYS = ['__proto__', 'constructor', 'prototype'];
+  var isSafeKey = function (key) { return UNSAFE_KEYS.indexOf(key) === -1; };
+
   function merge(base, override) {
     if (!isPlain(base)) return override === undefined ? base : override;
     var out = {};
-    Object.keys(base).forEach(function (key) { out[key] = base[key]; });
+    Object.keys(base).forEach(function (key) { if (isSafeKey(key)) out[key] = base[key]; });
     if (!isPlain(override)) return out;
     Object.keys(override).forEach(function (key) {
+      if (!isSafeKey(key)) return;          // never let content touch the prototype
       var value = override[key];
       if (value === undefined) return;
       out[key] = isPlain(value) && isPlain(out[key]) ? merge(out[key], value) : value;
@@ -38,6 +42,18 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
 
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
+  }
+
+  /* Content is admin-written, but a link is the one place where "text" can turn
+     into code, so anything that is not a plain http(s)/mail/tel/relative target
+     is dropped rather than put in an href or src. */
+  function safeUrl(value) {
+    var url = String(value == null ? '' : value).trim();
+    if (!url) return '';
+    if (/^(https?:|mailto:|tel:)/i.test(url)) return url;
+    if (/^data:image\/(png|jpeg|gif|webp|avif);base64,[a-z0-9+/=]+$/i.test(url)) return url;
+    if (/^[^:]*$/.test(url.split(/[?#]/)[0])) return url;
+    return '';
   }
 
   function escapeHtml(text) {
@@ -137,10 +153,14 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
       set('--r-xl', Math.round(r * 1.4) + 'px');
     }
 
+    /* A font name goes into a CSS value and a Google Fonts URL, so keep it to
+       the letters, digits and spaces a family name is actually made of. */
+    var family = function (name) { return String(name || '').replace(/[^a-z0-9 ]/gi, '').trim().slice(0, 40); };
     var families = [];
-    if (theme.fontDisplay) { set('--font-display', '"' + theme.fontDisplay + '"' + FONT_STACKS.display); families.push(theme.fontDisplay); }
-    if (theme.fontSans) { set('--font-sans', '"' + theme.fontSans + '"' + FONT_STACKS.sans); families.push(theme.fontSans); }
-    if (theme.fontScript) { set('--font-script', '"' + theme.fontScript + '"' + FONT_STACKS.script); families.push(theme.fontScript); }
+    var display = family(theme.fontDisplay), sans = family(theme.fontSans), script = family(theme.fontScript);
+    if (display) { set('--font-display', '"' + display + '"' + FONT_STACKS.display); families.push(display); }
+    if (sans) { set('--font-sans', '"' + sans + '"' + FONT_STACKS.sans); families.push(sans); }
+    if (script) { set('--font-script', '"' + script + '"' + FONT_STACKS.script); families.push(script); }
     loadFonts(families);
   }
 
@@ -205,11 +225,11 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
       el.innerHTML = escapeHtml(value).replace(/\n/g, '<br>');
     });
     Array.prototype.forEach.call(scope.querySelectorAll('[data-cms-src]'), function (el) {
-      var value = read(el.getAttribute('data-cms-src'));
+      var value = safeUrl(read(el.getAttribute('data-cms-src')));
       if (value) el.setAttribute('src', value);
     });
     Array.prototype.forEach.call(scope.querySelectorAll('[data-cms-href]'), function (el) {
-      var value = read(el.getAttribute('data-cms-href'));
+      var value = safeUrl(read(el.getAttribute('data-cms-href')));
       if (value) el.setAttribute('href', value);
     });
     Array.prototype.forEach.call(scope.querySelectorAll('[data-cms-alt]'), function (el) {
@@ -247,6 +267,9 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
     var data = LBContent.data;
     CONFIG = merge(data.settings || {}, {});
     CONFIG.brand = data.settings.brand;
+    /* The currency symbol is pasted straight into prices all over the shop, so
+       keep it to what a symbol can be — no HTML characters. */
+    CONFIG.currency = String(CONFIG.currency == null ? '$' : CONFIG.currency).replace(/[<>&"']/g, '').slice(0, 6);
     CATEGORIES = (data.categories || []).filter(function (c) { return c && c.id; });
     PRODUCTS = normaliseProducts(data.products);
     COPY = data;
@@ -345,7 +368,8 @@ var CONFIG, CATEGORIES, PRODUCTS, COPY;
     whenReady(function () {
       var previous = document.querySelector('.lb-focus');
       if (previous) previous.classList.remove('lb-focus');
-      var target = id ? document.querySelector('[data-section-id="' + id + '"]') : null;
+      var safeId = String(id || '').replace(/[^a-z0-9_-]/gi, '');
+      var target = safeId ? document.querySelector('[data-section-id="' + safeId + '"]') : null;
       if (!target) return;
       target.classList.add('lb-focus');
       var top = target.getBoundingClientRect().top + window.scrollY - 80;

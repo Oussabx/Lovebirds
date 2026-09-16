@@ -137,8 +137,22 @@ async function readBody(req) {
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch (e) { return {}; }
 }
 
-const clientIp = (req) =>
-  String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
+/* Rate limiting is only as good as the address it counts against, and every
+   x-forwarded-for entry a client sends is a value the client chose. Off Vercel
+   we use the socket address; on Vercel we use the headers the edge sets itself,
+   taking the last entry so anything a client prepended is ignored. */
+const lastEntry = (value) => {
+  const parts = String(value || '').split(',').map(part => part.trim()).filter(Boolean);
+  return parts.length ? parts[parts.length - 1] : '';
+};
+
+function clientIp(req) {
+  const socketIp = (req.socket && req.socket.remoteAddress) || 'unknown';
+  if (!process.env.VERCEL) return socketIp;
+  return lastEntry(req.headers['x-vercel-forwarded-for']) ||
+         lastEntry(req.headers['x-real-ip']) ||
+         socketIp;
+}
 
 const isSecure = (req) =>
   Boolean(process.env.VERCEL) || String(req.headers['x-forwarded-proto'] || '').split(',')[0] === 'https';
@@ -249,14 +263,35 @@ function orderId() {
 
 const clean = (value, max) => String(value == null ? '' : value).trim().slice(0, max || 200);
 
+const UNSAFE_KEYS = ['__proto__', 'constructor', 'prototype'];
+
+/* Walks a parsed JSON value looking for keys that would poison Object.prototype
+   once the browser merges the content. */
+function findUnsafeKey(value, depth) {
+  if (depth > 12 || !value || typeof value !== 'object') return null;
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      const hit = findUnsafeKey(entry, depth + 1);
+      if (hit) return hit;
+    }
+    return null;
+  }
+  for (const key of Object.keys(value)) {
+    if (UNSAFE_KEYS.indexOf(key) > -1) return key;
+    const hit = findUnsafeKey(value[key], depth + 1);
+    if (hit) return hit;
+  }
+  return null;
+}
+
 function handle(fn) {
   return async (req, res) => {
     try {
       await fn(req, res);
     } catch (err) {
-      const message = err && err.message ? err.message : 'Server error';
-      console.error('[lovebirds]', message);
-      if (!res.headersSent) fail(res, 500, message);
+      /* Log the detail, tell the caller as little as possible. */
+      console.error('[lovebirds]', (err && err.stack) || err);
+      if (!res.headersSent) fail(res, 500, 'Something went wrong on our side. Please try again.');
     }
   };
 }
@@ -265,7 +300,7 @@ module.exports = {
   connected, cmd, getJSON, setJSON,
   json, ok, fail, readBody, clientIp, readCookie, writeCookie,
   rateLimit, clearRateLimit, LOGIN_WINDOW, LOGIN_MAX, ORDER_WINDOW, ORDER_MAX,
-  hashPassword, makePassword, samePassword, sameSecret,
+  hashPassword, makePassword, samePassword, sameSecret, findUnsafeKey,
   createSession, readSession, destroySession, requireAdmin, SESSION_TTL,
   CONTENT_KEY, CONTENT_PREV_KEY, AUTH_KEY, orderId, clean, handle
 };

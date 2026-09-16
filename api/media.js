@@ -4,7 +4,9 @@ const L = require('./_lib');
 
 const INDEX = 'lb:images';
 const MAX_BYTES = 2.4 * 1024 * 1024;
-const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/avif'];
+/* SVG is deliberately absent: it is a script-bearing document, and serving one
+   from this origin would let it act with the dashboard's own privileges. */
+const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 
 module.exports = L.handle(async (req, res) => {
   const method = (req.method || 'GET').toUpperCase();
@@ -21,9 +23,15 @@ module.exports = L.handle(async (req, res) => {
       if (!match) { res.statusCode = 500; return res.end('Broken image'); }
       const buffer = Buffer.from(match[2], 'base64');
       res.statusCode = 200;
-      res.setHeader('Content-Type', match[1]);
+      /* The stored type came from a client, and older uploads pre-date the SVG
+         block, so anything not on the allow list is served as an opaque blob. */
+      res.setHeader('Content-Type', ALLOWED.indexOf(match[1]) > -1 ? match[1] : 'application/octet-stream');
       res.setHeader('Content-Length', buffer.length);
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      /* Defence in depth for anything uploaded before SVG was blocked: served
+         with no privileges of its own, and never sniffed into something else. */
+      res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+      res.setHeader('X-Content-Type-Options', 'nosniff');
       return res.end(buffer);
     }
 
@@ -45,7 +53,7 @@ module.exports = L.handle(async (req, res) => {
     const dataUrl = String(body.dataUrl || '');
     const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
     if (!match) return L.fail(res, 400, 'That file could not be read as an image.');
-    if (ALLOWED.indexOf(match[1]) === -1) return L.fail(res, 415, 'Use a JPG, PNG, WebP, GIF or SVG.');
+    if (ALLOWED.indexOf(match[1]) === -1) return L.fail(res, 415, 'Use a JPG, PNG, WebP, GIF or AVIF picture.');
 
     const bytes = Math.ceil(match[2].length * 0.75);
     if (bytes > MAX_BYTES) return L.fail(res, 413, 'That image is ' + Math.round(bytes / 1024) + ' KB. Keep it under 2 MB.');

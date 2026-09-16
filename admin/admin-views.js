@@ -18,6 +18,21 @@
                    'p-cards', 'p-tote', 'p-frame', 'p-chocolate', 'p-memorybox', 'scene-wrap', 'scene-note']
                    .map(n => 'assets/img/' + n + '.svg');
 
+  /* A backup file could have come from anywhere, so strip keys that would write
+     to Object.prototype when the content is merged. */
+  const UNSAFE_KEYS = ['__proto__', 'constructor', 'prototype'];
+  function stripUnsafeKeys(value, depth) {
+    depth = depth || 0;
+    if (depth > 12 || !value || typeof value !== 'object') return value;
+    if (Array.isArray(value)) return value.map(entry => stripUnsafeKeys(entry, depth + 1));
+    const out = {};
+    Object.keys(value).forEach(key => {
+      if (UNSAFE_KEYS.indexOf(key) > -1) return;
+      out[key] = stripUnsafeKeys(value[key], depth + 1);
+    });
+    return out;
+  }
+
   const slugify = (text) => String(text || '')
     .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
@@ -125,7 +140,7 @@
   function fImage(path, label) {
     const value = get(path) || '';
     return '<div class="field"><span class="field__label">' + esc(label) + '</span><div class="picker">' +
-      '<img src="' + esc(previewSrc(value)) + '" alt="" onerror="this.style.opacity=.25">' +
+      '<img src="' + esc(previewSrc(value)) + '" alt="" data-fade-on-error>' +
       '<div class="picker__actions">' +
       '<button class="btn btn--ghost btn--tiny" data-pick="' + path + '">Choose image</button>' +
       '<button class="btn btn--ghost btn--tiny" data-clear="' + path + '">Clear</button>' +
@@ -838,7 +853,7 @@
 
     return card('Your pictures', [
       '<p class="field__hint" style="margin-bottom:16px">Upload photos here, then pick them for products, categories or the home page. Big photos are shrunk automatically.</p>',
-      '<input type="file" accept="image/*" multiple data-upload hidden>',
+      '<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" multiple data-upload hidden>',
       state.images.length ? '<div class="grid grid--media">' + tiles + '</div>'
         : '<div class="empty"><h3>No pictures yet</h3><p>Upload your product photos and they will appear here.</p></div>'
     ].join(''), '<button class="btn btn--sm" data-upload-trigger>' + ICON.plus + ' Upload pictures</button>');
@@ -891,7 +906,7 @@
 
   async function shrink(file) {
     const dataUrl = await readFile(file);
-    if (file.type === 'image/svg+xml' || file.type === 'image/gif') return dataUrl;
+    if (file.type === 'image/gif') return dataUrl;   // flattening a GIF would drop its animation
     if (file.size < 260 * 1024) return dataUrl;
     return new Promise((resolve) => {
       const img = new Image();
@@ -960,7 +975,7 @@
       '<input type="text" data-url-input placeholder="https://…" aria-label="Image link"><button class="btn btn--sm" data-url-use>Use</button></div></label>',
       '<div class="card__head" style="margin:18px 0 10px"><h2 style="font-size:1rem">Your uploads</h2>',
       '<button class="btn btn--ghost btn--sm" data-picker-upload>Upload new</button>',
-      '<input type="file" accept="image/*" data-picker-file hidden></div>',
+      '<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" data-picker-file hidden></div>',
       state.images.length ? '<div class="grid grid--media">' + library + '</div>'
         : '<p class="field__hint">Nothing uploaded yet.</p>',
       '<h2 style="font-size:1rem;margin:22px 0 10px">Built-in artwork</h2>',
@@ -994,6 +1009,14 @@
       };
     });
   }
+
+  /* Pictures that fail to load fade instead of showing a broken icon.
+     Done here rather than with an inline handler so the page can run under a
+     strict Content-Security-Policy. */
+  document.addEventListener('error', (e) => {
+    const img = e.target;
+    if (img && img.tagName === 'IMG' && img.hasAttribute('data-fade-on-error')) img.style.opacity = '.25';
+  }, true);
 
   /* ------------------------------------------------------------- events */
   document.addEventListener('input', (e) => {
@@ -1370,7 +1393,7 @@
       try {
         const parsed = JSON.parse(reader.result);
         if (!parsed || !Array.isArray(parsed.products)) throw new Error('That file is not a lovebirds backup.');
-        state.content = parsed;
+        state.content = stripUnsafeKeys(parsed);
         markDirty();
         render();
         toast('Backup loaded — press Save changes to publish it', 'good');

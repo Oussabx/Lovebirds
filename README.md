@@ -59,7 +59,7 @@ there — there is no need to touch code.
 | Text & pages | Pick a page along the top, a section down the side, and edit just that section — with a **live preview** beside it showing the real page, scrolled to the section and updating as you type. Covers every heading, paragraph, button label, picture and list on the site |
 | Appearance | The eight brand colours, three fonts and corner roundness, with a live preview |
 | Shop settings | Shop name, currency and its position, WhatsApp number and greeting, contact details, delivery fee, free-delivery threshold, country list, announcement bar, menu links |
-| Images | Upload photos (they are shrunk in the browser first) and pick them anywhere an image is used |
+| Images | Upload photos (JPG, PNG, WebP, GIF or AVIF — shrunk in the browser first) and pick them anywhere an image is used |
 | Account & backup | Change the password, download or restore a full backup, undo the last save, reset the shop to its original content |
 
 Shop settings also holds the WhatsApp order alerts — switch them on or off, choose
@@ -196,6 +196,11 @@ The illustrations in `assets/img/` are original SVG artwork made for this build,
 looks finished out of the box. To use photography instead, drop your files in `assets/img/`
 and point `image:` at them — anything square (1:1) works.
 
+Uploads through the dashboard accept JPG, PNG, WebP, GIF and AVIF. SVG is refused on upload:
+it is a document that can carry script, and served from the shop's own domain it would run
+with the dashboard's privileges. SVG files committed to `assets/img/` are fine — those are
+yours, not a visitor's.
+
 ## How it is put together
 
 ```
@@ -252,6 +257,13 @@ to replace them.
   already sets the headers. Every push to `main` redeploys automatically.
 * **GitHub Pages** — Settings → Pages → deploy from branch `main`, folder `/ (root)`.
 * **Netlify** — import the repo, no build command, publish directory `.`.
+
+## Security
+
+`SECURITY.md` covers how the dashboard is protected, what each environment variable is for,
+and what to do if you think someone got in. Two rules worth knowing before you edit the site:
+the Content-Security-Policy in `vercel.json` forbids inline `<script>` blocks and `onclick=`
+attributes, and anything from the dashboard that lands in a page must go through `esc()`.
 
 ## Browser support
 

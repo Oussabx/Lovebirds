@@ -34,6 +34,23 @@
   };
 
   /* ------------------------------------------------------------- helpers */
+  /* Everything below builds markup by hand, and all of it comes from the
+     dashboard, so every value that lands in HTML goes through esc() and every
+     link through safeUrl() — a javascript: href is never a picture or a page. */
+  function esc(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function safeUrl(value) {
+    const url = String(value == null ? '' : value).trim();
+    if (!url) return '';
+    if (/^(https?:|mailto:|tel:)/i.test(url)) return url;
+    if (/^data:image\/(png|jpeg|gif|webp|avif);base64,[a-z0-9+/=]+$/i.test(url)) return url;
+    if (/^[^:]*$/.test(url.split(/[?#]/)[0])) return url;   // relative path, no scheme
+    return '';
+  }
+
   const copy = (path, fallback) =>
     (window.LBContent ? window.LBContent.get(path, fallback) : fallback);
 
@@ -61,7 +78,7 @@
     }
     const el = document.createElement('div');
     el.className = 'toast';
-    el.innerHTML = (icon || ICONS.heart) + '<span>' + message + '</span>';
+    el.innerHTML = (icon || ICONS.heart) + '<span>' + esc(message) + '</span>';
     toastBox.appendChild(el);
     setTimeout(() => {
       el.classList.add('is-out');
@@ -145,19 +162,19 @@
     const fav = Favs.has(p.id) ? ' is-on' : '';
     return [
       '<article class="product-card"' + (reveal === false ? '' : ' data-reveal="scale"') + '>',
-      p.badge ? '<span class="product-card__badge">' + p.badge + '</span>' : '',
-      '<button class="product-card__fav' + fav + '" data-fav="' + p.id + '" aria-label="Save ' + p.name + '" aria-pressed="' + (fav ? 'true' : 'false') + '">' + ICONS.heart + '</button>',
-      '<a class="product-card__media" href="product.html?id=' + p.id + '" tabindex="-1" aria-hidden="true">',
-      '<img src="' + p.images[0] + '" alt="" loading="lazy" width="640" height="640">',
-      '<img src="' + p.images[1] + '" alt="" loading="lazy" width="640" height="640">',
+      p.badge ? '<span class="product-card__badge">' + esc(p.badge) + '</span>' : '',
+      '<button class="product-card__fav' + fav + '" data-fav="' + esc(p.id) + '" aria-label="Save ' + esc(p.name) + '" aria-pressed="' + (fav ? 'true' : 'false') + '">' + ICONS.heart + '</button>',
+      '<a class="product-card__media" href="product.html?id=' + encodeURIComponent(p.id) + '" tabindex="-1" aria-hidden="true">',
+      '<img src="' + esc(safeUrl(p.images[0])) + '" alt="" loading="lazy" width="640" height="640">',
+      '<img src="' + esc(safeUrl(p.images[1])) + '" alt="" loading="lazy" width="640" height="640">',
       '</a>',
       '<div class="product-card__body">',
-      '<span class="product-card__cat">' + cat + '</span>',
-      '<a class="product-card__link" href="product.html?id=' + p.id + '"><h3 class="product-card__title">' + p.name + '</h3></a>',
-      '<p class="product-card__tag">' + p.short + '</p>',
+      '<span class="product-card__cat">' + esc(cat) + '</span>',
+      '<a class="product-card__link" href="product.html?id=' + encodeURIComponent(p.id) + '"><h3 class="product-card__title">' + esc(p.name) + '</h3></a>',
+      '<p class="product-card__tag">' + esc(p.short) + '</p>',
       '<div class="product-card__foot">',
       '<span class="product-card__price">' + money(p.price) + '</span>',
-      '<button class="product-card__add" data-add="' + p.id + '">Add to cart</button>',
+      '<button class="product-card__add" data-add="' + esc(p.id) + '">Add to cart</button>',
       '</div></div></article>'
     ].join('');
   }
@@ -212,18 +229,18 @@
   function drawerHTML() {
     return [
       '<div class="overlay" data-overlay hidden></div>',
-      '<aside class="cart" id="cart-drawer" role="dialog" aria-modal="true" aria-label="' + copy('cart.title', 'Your cart') + '" aria-hidden="true">',
+      '<aside class="cart" id="cart-drawer" role="dialog" aria-modal="true" aria-label="' + esc(copy('cart.title', 'Your cart')) + '" aria-hidden="true">',
       '<header class="cart__head">',
-      '<div><h2>' + copy('cart.title', 'Your cart') + '</h2><span class="count" data-cart-count-text>0 items</span></div>',
+      '<div><h2>' + esc(copy('cart.title', 'Your cart')) + '</h2><span class="count" data-cart-count-text>0 items</span></div>',
       '<button class="icon-btn" data-cart-close aria-label="Close cart">' + ICONS.close + '</button>',
       '</header>',
       '<div class="cart__body" data-cart-body></div>',
       '<footer class="cart__foot" data-cart-foot hidden>',
       '<div class="cart__ship" data-cart-ship></div>',
-      '<div class="cart__row"><span>' + copy('cart.subtotalLabel', 'Subtotal') + '</span><strong data-cart-subtotal>' + money(0) + '</strong></div>',
-      '<p class="cart__note">' + copy('cart.note', '') + '</p>',
-      '<a class="btn btn--block btn--lg" href="checkout.html">' + copy('cart.checkoutLabel', 'Checkout') + ' ' + ICONS.arrow + '</a>',
-      '<button class="btn btn--ghost btn--block mt-3" data-cart-close style="margin-top:12px">' + copy('cart.continueLabel', 'Continue shopping') + '</button>',
+      '<div class="cart__row"><span>' + esc(copy('cart.subtotalLabel', 'Subtotal')) + '</span><strong data-cart-subtotal>' + money(0) + '</strong></div>',
+      '<p class="cart__note">' + esc(copy('cart.note', '')) + '</p>',
+      '<a class="btn btn--block btn--lg" href="checkout.html">' + esc(copy('cart.checkoutLabel', 'Checkout')) + ' ' + ICONS.arrow + '</a>',
+      '<button class="btn btn--ghost btn--block mt-3" data-cart-close style="margin-top:12px">' + esc(copy('cart.continueLabel', 'Continue shopping')) + '</button>',
       '</footer></aside>'
     ].join('');
   }
@@ -254,29 +271,29 @@
     const foot = $('[data-cart-foot]');
     if (!lines.length) {
       body.innerHTML = '<div class="empty">' + ICONS.heartLine +
-        '<h3>' + copy('cart.emptyTitle', 'Nothing in here yet') + '</h3>' +
-        '<p>' + copy('cart.emptyText', '') + '</p>' +
-        '<a class="btn btn--ghost" href="categories.html">' + copy('cart.browseLabel', 'Shop gifts') + '</a></div>';
+        '<h3>' + esc(copy('cart.emptyTitle', 'Nothing in here yet')) + '</h3>' +
+        '<p>' + esc(copy('cart.emptyText', '')) + '</p>' +
+        '<a class="btn btn--ghost" href="categories.html">' + esc(copy('cart.browseLabel', 'Shop gifts')) + '</a></div>';
       if (foot) foot.hidden = true;
       return;
     }
     if (foot) foot.hidden = false;
 
     body.innerHTML = lines.map(l => [
-      '<div class="cart-item" data-line="' + l.id + '">',
-      '<a class="cart-item__media" href="product.html?id=' + l.id + '"><img src="' + l.product.images[0] + '" alt="' + l.product.name + '" width="160" height="160"></a>',
+      '<div class="cart-item" data-line="' + esc(l.id) + '">',
+      '<a class="cart-item__media" href="product.html?id=' + encodeURIComponent(l.id) + '"><img src="' + esc(safeUrl(l.product.images[0])) + '" alt="' + esc(l.product.name) + '" width="160" height="160"></a>',
       '<div>',
-      '<h3 class="cart-item__title">' + l.product.name + '</h3>',
-      '<p class="cart-item__meta">' + categoryName(l.product.category) + ' · ' + money(l.product.price) + '</p>',
+      '<h3 class="cart-item__title">' + esc(l.product.name) + '</h3>',
+      '<p class="cart-item__meta">' + esc(categoryName(l.product.category)) + ' · ' + money(l.product.price) + '</p>',
       '<div class="cart-item__foot">',
       '<div class="qty">',
-      '<button data-dec="' + l.id + '" aria-label="Decrease quantity">' + ICONS.minus + '</button>',
-      '<span>' + l.qty + '</span>',
-      '<button data-inc="' + l.id + '" aria-label="Increase quantity">' + ICONS.plus + '</button>',
+      '<button data-dec="' + esc(l.id) + '" aria-label="Decrease quantity">' + ICONS.minus + '</button>',
+      '<span>' + esc(l.qty) + '</span>',
+      '<button data-inc="' + esc(l.id) + '" aria-label="Increase quantity">' + ICONS.plus + '</button>',
       '</div>',
       '<span class="cart-item__price">' + money(l.total) + '</span>',
       '</div>',
-      '<button class="cart-item__remove" data-remove="' + l.id + '">Remove</button>',
+      '<button class="cart-item__remove" data-remove="' + esc(l.id) + '">Remove</button>',
       '</div></div>'
     ].join('')).join('');
 
@@ -291,8 +308,8 @@
       if (!CONFIG.freeShippingOver) { ship.innerHTML = ''; }
       else {
         ship.innerHTML = left > 0
-          ? '<p>' + money(left) + ' ' + copy('cart.freeAway', 'away from free delivery') + '</p><div class="cart__ship-bar"><i style="width:' + pct + '%"></i></div>'
-          : '<p>' + ICONS.check + ' ' + copy('cart.freeDone', 'You have free delivery') + '</p><div class="cart__ship-bar"><i style="width:100%"></i></div>';
+          ? '<p>' + money(left) + ' ' + esc(copy('cart.freeAway', 'away from free delivery')) + '</p><div class="cart__ship-bar"><i style="width:' + pct + '%"></i></div>'
+          : '<p>' + ICONS.check + ' ' + esc(copy('cart.freeDone', 'You have free delivery')) + '</p><div class="cart__ship-bar"><i style="width:100%"></i></div>';
       }
     }
   }
@@ -331,7 +348,7 @@
       const column = copy('footer.columns.' + list.dataset.footerLinks, null);
       if (!column || !Array.isArray(column.links)) return;
       list.innerHTML = column.links
-        .map(link => '<li><a href="' + link.href + '">' + link.label + '</a></li>').join('');
+        .map(link => '<li><a href="' + esc(safeUrl(link.href) || '#') + '">' + esc(link.label) + '</a></li>').join('');
     });
     const mail = copy('settings.email', '');
     $$('[data-mail]').forEach(a => { if (mail) a.setAttribute('href', 'mailto:' + mail); });
@@ -455,7 +472,7 @@
 
   /* ------------------------------------------------------------- export */
   window.LB = {
-    $: $, $$: $$, ICONS: ICONS, money: money, waLink: waLink,
+    $: $, $$: $$, ICONS: ICONS, money: money, waLink: waLink, esc: esc, safeUrl: safeUrl,
     Cart: Cart, Favs: Favs, toast: toast, productCard: productCard, copy: copy,
     previewCart: (items) => {
       previewItems = Array.isArray(items) && items.length ? items : null;

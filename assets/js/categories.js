@@ -1,6 +1,6 @@
 /* Categories / shop page — filtering and sorting over the live catalogue */
 (function () {
-  const { $, $$, productCard, observe, refreshParallax } = window.LB;
+  const { $, $$, productCard, observe, refreshParallax, esc } = window.LB;
 
   const grid = $('[data-grid]');
   if (!grid) return;
@@ -17,8 +17,8 @@
   function chips() {
     const shop = COPY.shop || {};
     const list = [{ id: 'all', name: shop.allLabel || 'All gifts' }].concat(CATEGORIES);
-    chipsBox.innerHTML = '<span class="filters__label">' + (shop.filterLabel || 'Shop for') + '</span>' +
-      list.map(c => '<button class="chip' + (c.id === active ? ' is-active' : '') + '" data-cat="' + c.id + '">' + c.name + '</button>').join('');
+    chipsBox.innerHTML = '<span class="filters__label">' + esc(shop.filterLabel || 'Shop for') + '</span>' +
+      list.map(c => '<button class="chip' + (c.id === active ? ' is-active' : '') + '" data-cat="' + esc(c.id) + '">' + esc(c.name) + '</button>').join('');
   }
 
   function sorted(list) {

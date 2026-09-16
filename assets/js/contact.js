@@ -1,6 +1,6 @@
 /* Contact page — details, message form and FAQ, all from content */
 (function () {
-  const { $, $$, ICONS, toast } = window.LB;
+  const { $, $$, ICONS, toast, esc, safeUrl } = window.LB;
 
   const icon = name => ICONS[name] || ICONS.heart;
 
@@ -32,12 +32,12 @@
     if (list) {
       list.innerHTML = (contact.info || []).filter(item => item && (String(item.title || '').trim() || String(item.text || '').trim())).map(item => {
         const body = item.whatsapp
-          ? '<p>' + item.text + '</p><button class="btn btn--wa btn--sm mt-3" data-wa data-wa-text="' +
-            (CONFIG.whatsappGreeting || '') + '">' + ICONS.chat + ' ' + (COPY.navWhatsappLabel || 'Chat on WhatsApp') + '</button>'
+          ? '<p>' + esc(item.text) + '</p><button class="btn btn--wa btn--sm mt-3" data-wa data-wa-text="' +
+            esc(CONFIG.whatsappGreeting || '') + '">' + ICONS.chat + ' ' + esc(COPY.navWhatsappLabel || 'Chat on WhatsApp') + '</button>'
           : (item.link
-              ? '<a href="' + item.link + '">' + item.text + '</a>'
-              : '<p>' + String(item.text || '').replace(/\n/g, '<br>') + '</p>');
-        return '<li><span class="info-list__icon">' + icon(item.icon) + '</span><div><h3>' + item.title + '</h3>' + body + '</div></li>';
+              ? '<a href="' + esc(safeUrl(item.link) || '#') + '">' + esc(item.text) + '</a>'
+              : '<p>' + esc(item.text || '').replace(/\n/g, '<br>') + '</p>');
+        return '<li><span class="info-list__icon">' + icon(item.icon) + '</span><div><h3>' + esc(item.title) + '</h3>' + body + '</div></li>';
       }).join('');
     }
 
@@ -45,8 +45,8 @@
     if (faq) {
       faq.innerHTML = (contact.faq || []).filter(entry => entry && String(entry.q || '').trim()).map((entry, i) => [
         '<div class="acc__item">',
-        '<button class="acc__btn" aria-expanded="' + (i === 0 ? 'true' : 'false') + '">' + entry.q + ICONS.plus + '</button>',
-        '<div class="acc__panel"' + (i === 0 ? '' : ' style="height:0"') + '><div class="acc__panel-inner"><p>' + entry.a + '</p></div></div>',
+        '<button class="acc__btn" aria-expanded="' + (i === 0 ? 'true' : 'false') + '">' + esc(entry.q) + ICONS.plus + '</button>',
+        '<div class="acc__panel"' + (i === 0 ? '' : ' style="height:0"') + '><div class="acc__panel-inner"><p>' + esc(entry.a) + '</p></div></div>',
         '</div>'
       ].join('')).join('');
       accordion(faq);

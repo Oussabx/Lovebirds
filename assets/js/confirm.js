@@ -1,6 +1,6 @@
 /* Order confirmation — reads the order placed at checkout */
 (function () {
-  const { $, ICONS, money } = window.LB;
+  const { $, ICONS, money, esc } = window.LB;
 
   const root = $('[data-confirm]');
   if (!root) return;
@@ -29,29 +29,29 @@
       '<div class="confirm__card" data-reveal="scale">',
       '<div class="center">',
       '<div class="confirm__badge">' + ICONS.check + '</div>',
-      '<span class="eyebrow">' + (labels.thanks || 'Thank you') + ', ' + (c.firstName || '') + '</span>',
-      '<h1>' + (labels.title || 'Your order is on its way') + '</h1>',
-      '<p class="lede center" style="margin:14px auto 0">' + (labels.text || '') + '</p>',
-      '<span class="confirm__id">Order ' + order.id + '</span>',
+      '<span class="eyebrow">' + esc(labels.thanks || 'Thank you') + ', ' + esc(c.firstName || '') + '</span>',
+      '<h1>' + esc(labels.title || 'Your order is on its way') + '</h1>',
+      '<p class="lede center" style="margin:14px auto 0">' + esc(labels.text || '') + '</p>',
+      '<span class="confirm__id">Order ' + esc(order.id) + '</span>',
       '</div>',
 
       '<div class="confirm__details">',
-      '<div><h3>Delivering to</h3><p>' + [(c.firstName || '') + ' ' + (c.lastName || ''), c.address, c.apartment, c.city, c.country].filter(Boolean).join('<br>') + '</p></div>',
-      '<div><h3>Contact &amp; payment</h3><p>' + [c.phone, c.email].filter(Boolean).join('<br>') + '<br><br>' + (order.payment || '') + '<br>Placed ' + when + '</p></div>',
+      '<div><h3>Delivering to</h3><p>' + [(c.firstName || '') + ' ' + (c.lastName || ''), c.address, c.apartment, c.city, c.country].filter(Boolean).map(esc).join('<br>') + '</p></div>',
+      '<div><h3>Contact &amp; payment</h3><p>' + [c.phone, c.email].filter(Boolean).map(esc).join('<br>') + '<br><br>' + esc(order.payment || '') + '<br>Placed ' + esc(when) + '</p></div>',
       '</div>',
 
-      order.note ? '<div class="confirm__lines" style="border-top:0;padding-top:0"><div><h3 style="font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Note on the card</h3><p style="font-family:var(--font-script);font-size:1.4rem;color:var(--wine)">' + order.note + '</p></div></div>' : '',
+      order.note ? '<div class="confirm__lines" style="border-top:0;padding-top:0"><div><h3 style="font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Note on the card</h3><p style="font-family:var(--font-script);font-size:1.4rem;color:var(--wine)">' + esc(order.note) + '</p></div></div>' : '',
 
       '<div class="confirm__lines">',
-      (order.lines || []).map(l => '<div class="confirm__line"><span>' + l.name + ' × ' + l.qty + '</span><span>' + money(l.total) + '</span></div>').join(''),
+      (order.lines || []).map(l => '<div class="confirm__line"><span>' + esc(l.name) + ' × ' + esc(l.qty) + '</span><span>' + money(l.total) + '</span></div>').join(''),
       '<div class="confirm__line"><span>Subtotal</span><span>' + money(order.subtotal) + '</span></div>',
       '<div class="confirm__line"><span>Delivery</span><span>' + (order.shipping === 0 ? 'Free' : money(order.shipping)) + '</span></div>',
       '<div class="confirm__line confirm__line--total"><span>Total to pay on delivery</span><strong>' + money(order.total) + '</strong></div>',
       '</div>',
 
       '<div class="confirm__actions">',
-      '<a class="btn btn--lg" href="categories.html">' + (labels.keepLabel || 'Keep browsing') + '</a>',
-      '<button class="btn btn--ghost btn--wa" data-wa data-wa-text="Hi! I just placed order ' + order.id + '.">' + ICONS.chat + ' ' + (labels.askLabel || 'Ask about this order') + '</button>',
+      '<a class="btn btn--lg" href="categories.html">' + esc(labels.keepLabel || 'Keep browsing') + '</a>',
+      '<button class="btn btn--ghost btn--wa" data-wa data-wa-text="Hi! I just placed order ' + esc(order.id) + '.">' + ICONS.chat + ' ' + esc(labels.askLabel || 'Ask about this order') + '</button>',
       '</div>',
       '</div>'
     ].join('');

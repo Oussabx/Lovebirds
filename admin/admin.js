@@ -75,8 +75,11 @@
   function getPath(object, path) {
     return String(path).split('.').reduce((node, key) => (node == null ? undefined : node[key]), object);
   }
+  const UNSAFE_KEYS = ['__proto__', 'constructor', 'prototype'];
+
   function setPath(object, path, value) {
     const parts = String(path).split('.');
+    if (parts.some(part => UNSAFE_KEYS.indexOf(part) > -1)) return;
     let node = object;
     for (let i = 0; i < parts.length - 1; i++) {
       const key = parts[i];
@@ -363,6 +366,7 @@
   /* ------------------------------------------------------------- overview */
   function viewOverview() {
     const orders = state.orders;
+    const whatsapp = (state.content && state.content.settings && state.content.settings.whatsapp) || '';
     const live = orders.filter(o => o.status !== 'cancelled');
     const revenue = live.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
     const newCount = orders.filter(o => o.status === 'new').length;
@@ -400,8 +404,8 @@
       '<div><div class="stat__label">Gifts on sale</div><div class="stat__value">' + (state.content.products || []).filter(p => p.active !== false).length + '</div>',
       '<p class="card__sub">' + (state.content.products || []).length + ' in the catalogue · ' + (state.content.categories || []).length + ' categories</p></div>',
       '<div><div class="stat__label">WhatsApp</div><div class="stat__value" style="font-size:1.3rem;margin-top:14px">' +
-        (state.content.settings.whatsapp ? esc(state.content.settings.whatsapp) : 'Not set') + '</div>',
-      '<p class="card__sub">' + (state.content.settings.whatsapp ? 'Chat buttons are live' : 'Add a number in Shop settings to switch the chat buttons on') + '</p></div>',
+        (whatsapp ? esc(whatsapp) : 'Not set') + '</div>',
+      '<p class="card__sub">' + (whatsapp ? 'Chat buttons are live' : 'Add a number in Shop settings to switch the chat buttons on') + '</p></div>',
       '</div>',
       '<div class="btn-row" style="margin-top:20px">',
       '<button class="btn btn--sm" data-go="products">Add or edit gifts</button>',
@@ -555,8 +559,14 @@
       (o.lines || []).map(l => l.qty + '× ' + l.name).join(' | '),
       o.subtotal, o.shipping, o.total, o.note || ''
     ]);
+    /* A cell beginning = + - @ or a control character is executed as a formula by
+       spreadsheet apps, so customer-supplied text gets a leading apostrophe. */
+    const safeCell = (cell) => {
+      const text = String(cell == null ? '' : cell);
+      return (/^[=+\-@\t\r]/.test(text) ? "'" + text : text).replace(/"/g, '""');
+    };
     const csv = [header].concat(rows)
-      .map(row => row.map(cell => '"' + String(cell == null ? '' : cell).replace(/"/g, '""') + '"').join(','))
+      .map(row => row.map(cell => '"' + safeCell(cell) + '"').join(','))
       .join('\r\n');
     download(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), 'lovebirds-orders.csv');
   }
