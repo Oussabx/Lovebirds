@@ -49,7 +49,7 @@
       '<div class="confirm__line confirm__line--total"><span>Total to pay on delivery</span><strong>' + money(order.total) + '</strong></div>',
       '</div>',
 
-      '<div class="center mt-4" style="display:grid;gap:12px;justify-items:center">',
+      '<div class="confirm__actions">',
       '<a class="btn btn--lg" href="categories.html">' + (labels.keepLabel || 'Keep browsing') + '</a>',
       '<button class="btn btn--ghost btn--wa" data-wa data-wa-text="Hi! I just placed order ' + order.id + '.">' + ICONS.chat + ' ' + (labels.askLabel || 'Ask about this order') + '</button>',
       '</div>',

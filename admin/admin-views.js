@@ -921,7 +921,7 @@
 
       card('Backup',
         '<p class="field__hint" style="margin-bottom:14px">Download everything — products, text, colours and settings — as one file, or restore it later.</p>' +
-        '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+        '<div class="btn-row">' +
         '<button class="btn btn--ghost btn--sm" data-export>' + ICON.download + ' Download backup</button>' +
         '<button class="btn btn--ghost btn--sm" data-import-trigger>Restore from a backup</button>' +
         '<input type="file" accept="application/json" data-import hidden>' +
@@ -929,7 +929,7 @@
 
       card('Start again',
         '<p class="field__hint" style="margin-bottom:14px">Undo puts back the version before your last save. Reset throws away everything you have saved and returns the shop to the content it shipped with.</p>' +
-        '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+        '<div class="btn-row">' +
         '<button class="btn btn--ghost btn--sm" data-undo>Undo my last save</button>' +
         '<button class="btn btn--danger btn--sm" data-reset>Reset the whole shop</button>' +
         '</div>'),

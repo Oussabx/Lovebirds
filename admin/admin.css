@@ -61,6 +61,16 @@ ul{margin:0;padding:0;list-style:none}
 .btn--danger{background:transparent;color:var(--bad);border:1px solid #EEC9C6}
 .btn--danger:hover{background:#FDF3F2}
 .btn--block{width:100%}
+/* a row of buttons: side by side while they fit, each filling the row it lands
+   on once they wrap — never two odd widths stacked on a phone */
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-row--spread{justify-content:space-between}
+@media(max-width:620px){
+  /* on a phone they never all fit: stack them at one width rather than
+     leaving a two-and-one row of mismatched buttons */
+  .btn-row{flex-direction:column;align-items:stretch}
+  .btn-row .btn{width:100%}
+}
 .btn--tiny{padding:8px 14px;font-size:.72rem;border-radius:999px;min-height:36px}
 
 /* ------------------------------------------------------------- login */

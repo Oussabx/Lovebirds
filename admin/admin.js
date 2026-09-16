@@ -403,7 +403,7 @@
         (state.content.settings.whatsapp ? esc(state.content.settings.whatsapp) : 'Not set') + '</div>',
       '<p class="card__sub">' + (state.content.settings.whatsapp ? 'Chat buttons are live' : 'Add a number in Shop settings to switch the chat buttons on') + '</p></div>',
       '</div>',
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">',
+      '<div class="btn-row" style="margin-top:20px">',
       '<button class="btn btn--sm" data-go="products">Add or edit gifts</button>',
       '<button class="btn btn--ghost btn--sm" data-go="content">Edit the words</button>',
       '<button class="btn btn--ghost btn--sm" data-go="appearance">Change the colours</button>',
@@ -477,7 +477,7 @@
       '<div class="grid grid--2" style="margin-bottom:18px">',
       '<div class="card" style="padding:16px"><div class="stat__label">Deliver to</div>',
       '<p style="white-space:pre-line;margin:8px 0 12px">' + esc(address) + '</p>',
-      '<div style="display:flex;gap:8px;flex-wrap:wrap">',
+      '<div class="btn-row">',
       '<button class="btn btn--ghost btn--tiny" data-copy="' + esc(address).replace(/\n/g, '&#10;') + '">Copy address</button>',
       wa ? '<a class="btn btn--ghost btn--tiny" href="https://wa.me/' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '',
       '<a class="btn btn--ghost btn--tiny" href="tel:' + esc(c.phone) + '">Call</a>',
@@ -502,7 +502,7 @@
       '</div>',
 
       '<label class="field"><span>Private note</span><textarea data-admin-note placeholder="Anything you need to remember about this order">' + esc(order.adminNote || '') + '</textarea></label>',
-      '<div style="display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap">',
+      '<div class="btn-row btn-row--spread">',
       '<button class="btn btn--danger btn--sm" data-delete-order>Delete order</button>',
       '<button class="btn btn--sm" data-save-note>Save note</button>',
       '</div>'

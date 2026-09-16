@@ -280,24 +280,35 @@ body.menu-open .nav__burger span:nth-child(3){transform:translateY(-6.5px) rotat
 .mobile-menu{
   position:fixed;inset:0;z-index:85;
   background:var(--cream-light);
-  padding:calc(var(--nav-h) + var(--ann-h,0px) + 26px) var(--pad) 40px;
-  display:flex;flex-direction:column;
+  padding:calc(var(--nav-h) + var(--ann-h,0px) + 10px) var(--pad) 28px;
+  display:flex;align-items:center;justify-content:center;
   clip-path:circle(0% at calc(100% - 42px) 38px);
   transition:clip-path .7s var(--ease-out);
   pointer-events:none;
   overflow-y:auto;
 }
 body.menu-open .mobile-menu{clip-path:circle(160% at calc(100% - 42px) 38px);pointer-events:auto}
-.mobile-menu__links{display:flex;flex-direction:column;gap:6px;margin-bottom:auto}
+
+/* one centred column, so the links and the buttons share an axis */
+.mobile-menu__inner{
+  width:min(330px,100%);margin-inline:auto;
+  display:flex;flex-direction:column;gap:clamp(24px,5vh,40px);text-align:center;
+}
+.mobile-menu__links{display:flex;flex-direction:column}
 .mobile-menu__links a{
-  font-family:var(--font-display);font-size:2.2rem;color:var(--wine);
-  padding-block:12px;border-bottom:1px solid var(--line);
-  opacity:0;transform:translateY(24px);
+  font-family:var(--font-display);font-size:clamp(1.45rem,6vw,1.7rem);color:var(--wine);
+  padding-block:16px;border-bottom:1px solid var(--line);
+  opacity:0;transform:translateY(18px);
   transition:opacity .5s var(--ease),transform .6s var(--ease-out);
 }
+.mobile-menu__links a:last-child{border-bottom:0}
 body.menu-open .mobile-menu__links a{opacity:1;transform:none;transition-delay:calc(.12s + var(--i,0) * .07s)}
-.mobile-menu__foot{padding-top:30px;display:grid;gap:14px}
-.mobile-menu__note{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+/* the two actions carry different weight: chat is the invitation, the cart is a
+   quiet shortcut — both centred on the same axis */
+.mobile-menu__foot{display:flex;flex-direction:column;align-items:center;gap:14px}
+.mobile-menu__cart{width:auto;align-self:center}
+.mobile-menu__note{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:2px}
 
 /* ---------------------------------------------------------------- hero */
 .hero{
@@ -846,6 +857,9 @@ body.menu-open .mobile-menu__links a{opacity:1;transform:none;transition-delay:c
 @media(min-width:640px){.confirm__details{grid-template-columns:1fr 1fr}}
 .confirm__details h3{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-family:var(--font-sans);margin-bottom:8px}
 .confirm__details p{font-size:.94rem;color:var(--ink);line-height:1.6}
+.confirm__actions{display:grid;gap:12px;margin:34px auto 0;max-width:340px}
+@media(min-width:620px){.confirm__actions{grid-template-columns:1fr 1fr;max-width:560px}}
+
 .confirm__lines{margin-top:28px;padding-top:24px;border-top:1px solid var(--line);display:grid;gap:12px;text-align:left}
 .confirm__line{display:flex;justify-content:space-between;gap:12px;font-size:.92rem;color:var(--ink-soft)}
 .confirm__line--total{padding-top:12px;border-top:1px solid var(--line);color:var(--ink)}
