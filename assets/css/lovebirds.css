@@ -329,6 +329,12 @@ body.menu-open .mobile-menu__links a{opacity:1;transform:none;transition-delay:c
 }
 .hero__copy .lede{margin-bottom:2em}
 .hero__cta{display:flex;flex-wrap:wrap;gap:14px}
+/* On narrow screens let each button fill the row it lands on: side by side while
+   they both fit, full width once they wrap — so they are never two odd widths.
+   flex-shrink is off so a label never wraps inside its own button. */
+@media(max-width:620px){
+  .hero__cta .btn{flex:1 0 auto;max-width:100%}
+}
 .hero__meta{
   display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,36px);margin-top:clamp(30px,4vw,46px);
   padding-top:26px;border-top:1px solid var(--line);
@@ -947,7 +953,11 @@ body.menu-open .mobile-menu__links a{opacity:1;transform:none;transition-delay:c
   :root{--nav-h:68px}
   .nav__brand .word{font-size:1.4rem}
   .nav__brand .mark{width:32px}
-  .hero__meta div{min-width:84px}
+  /* the three facts share the row evenly instead of splitting two and one */
+  .hero__meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .hero__meta div{min-width:0}
+  .hero__meta strong{font-size:1.2rem}
+  .hero__meta span{font-size:.62rem;letter-spacing:.14em}
   .hero__chip{padding:11px 15px;font-size:.72rem}
   .hero__chip .script{font-size:1.15rem}
   .gallery__thumbs button{width:68px}

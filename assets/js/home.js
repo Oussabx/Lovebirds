@@ -26,13 +26,13 @@
 
     const stats = $('[data-hero-stats]');
     if (stats && home.hero) {
-      stats.innerHTML = (home.hero.stats || []).map(s =>
+      stats.innerHTML = (home.hero.stats || []).filter(s => s && (String(s.value || '').trim() || String(s.label || '').trim())).map(s =>
         '<div><strong>' + s.value + '</strong><span>' + s.label + '</span></div>').join('');
     }
 
     const marquee = $('[data-marquee]');
     if (marquee) {
-      const items = (home.marquee || []).map(text =>
+      const items = (home.marquee || []).filter(text => String(text || '').trim()).map(text =>
         '<span>' + text + '</span>' + ICONS.heart).join('');
       marquee.innerHTML = '<div class="marquee__group">' + items + '</div><div class="marquee__group">' + items + '</div>';
     }
@@ -48,13 +48,13 @@
 
     const points = $('[data-story-points]');
     if (points && home.story) {
-      points.innerHTML = (home.story.points || []).map(p =>
+      points.innerHTML = (home.story.points || []).filter(p => p && String(p.text || '').trim()).map(p =>
         '<li>' + icon(p.icon) + ' ' + p.text + '</li>').join('');
     }
 
     const values = $('[data-values]');
     if (values && home.values) {
-      values.innerHTML = (home.values.items || []).map(v => [
+      values.innerHTML = (home.values.items || []).filter(v => v && (String(v.title || '').trim() || String(v.text || '').trim())).map(v => [
         '<div class="value"><div class="value__icon">' + icon(v.icon) + '</div>',
         '<h3>' + v.title + '</h3><p>' + v.text + '</p></div>'
       ].join('')).join('');
@@ -62,7 +62,7 @@
 
     const quotes = $('[data-quotes]');
     if (quotes && home.quotes) {
-      quotes.innerHTML = (home.quotes.items || []).map(q => [
+      quotes.innerHTML = (home.quotes.items || []).filter(q => q && String(q.text || '').trim()).map(q => [
         '<blockquote class="quote"><div class="quote__stars">',
         ICONS.star.repeat(Math.max(1, Math.min(5, Number(q.stars) || 5))),
         '</div><p>“' + q.text + '”</p><footer>' + q.author + '</footer></blockquote>'

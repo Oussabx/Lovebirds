@@ -30,7 +30,7 @@
 
     const list = $('[data-contact-info]');
     if (list) {
-      list.innerHTML = (contact.info || []).map(item => {
+      list.innerHTML = (contact.info || []).filter(item => item && (String(item.title || '').trim() || String(item.text || '').trim())).map(item => {
         const body = item.whatsapp
           ? '<p>' + item.text + '</p><button class="btn btn--wa btn--sm mt-3" data-wa data-wa-text="' +
             (CONFIG.whatsappGreeting || '') + '">' + ICONS.chat + ' ' + (COPY.navWhatsappLabel || 'Chat on WhatsApp') + '</button>'
@@ -43,7 +43,7 @@
 
     const faq = $('[data-faq]');
     if (faq) {
-      faq.innerHTML = (contact.faq || []).map((entry, i) => [
+      faq.innerHTML = (contact.faq || []).filter(entry => entry && String(entry.q || '').trim()).map((entry, i) => [
         '<div class="acc__item">',
         '<button class="acc__btn" aria-expanded="' + (i === 0 ? 'true' : 'false') + '">' + entry.q + ICONS.plus + '</button>',
         '<div class="acc__panel"' + (i === 0 ? '' : ' style="height:0"') + '><div class="acc__panel-inner"><p>' + entry.a + '</p></div></div>',

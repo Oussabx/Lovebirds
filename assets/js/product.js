@@ -81,12 +81,13 @@
       '</div>',
 
       '<ul class="pdp__assure">',
-      (labels.assurances || []).map(a => '<li>' + icon(a.icon) + ' ' + a.text + '</li>').join(''),
+      (labels.assurances || []).filter(a => a && String(a.text || '').trim())
+        .map(a => '<li>' + icon(a.icon) + ' ' + a.text + '</li>').join(''),
       '</ul>',
 
       '<div class="acc">',
       accItem(labels.tabDescription || 'Description', '<p>' + (p.description || '') + '</p>', true),
-      p.includes.length ? accItem(labels.tabIncludes || 'What’s inside', '<ul>' + p.includes.map(i => '<li>' + i + '</li>').join('') + '</ul>', false) : '',
+      p.includes.filter(Boolean).length ? accItem(labels.tabIncludes || 'What’s inside', '<ul>' + p.includes.filter(Boolean).map(i => '<li>' + i + '</li>').join('') + '</ul>', false) : '',
       accItem(labels.tabDelivery || 'Delivery & returns', '<p>' + (labels.deliveryText || '') + '</p>', false),
       '</div>',
 
